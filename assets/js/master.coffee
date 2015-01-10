@@ -1,35 +1,29 @@
-$ ->
-  messages = []
-  window.socket = socket = io.connect("#{window.location.protocol}//#{window.location.host}")
+chatApp = angular.module 'chat-app', ['socketIO']
 
-  room = 0
+ChatCtrl = ($scope, $socket) ->
+  $scope.messages = []
 
-  appendData = (data) ->
-    { user, message } = data
-    if message
-      messages.push { user, message }
-      $('.stuff').html ''
-      $('.stuff').append "#{i.user}: #{i.message}<br />" for i in messages
-      console.log 'MESSAGEEEEEEEEEEEE'
-    else
-      console.log 'problem lol'
+  $scope.room = 0
 
-  socket.on 'room-0', (data) ->
-    if data instanceof Array
-      appendData(i) for i in data
-    else if data instanceof Object
-      appendData(data)
-    else
-      throw "Invalid return value"
+  $socket.emit 'room:new', room: $scope.room
 
+  $socket.on "room:id:#{$scope.room}:initial", (data) ->
+    throw "Invalid value from server" unless data instanceof Array
+    appendMessage(item) for item in data
 
-  socket.emit 'initial', { room }
+  $socket.on "room:id:#{$scope.room}", appendMessage
 
-  $('.chat').submit (e) ->
-    e.preventDefault()
+  $scope.sendMessage = ->
+    if $scope.currentMessage && $scope.currentUser
+      $socket.emit 'message:send',
+        user: $scope.currentUser
+        message: $scope.currentMessage
+        room: $scope.room
+      $scope.currentMessage = ''
 
-    user = $('.user input').val()
-    message = $('.message input').val()
-    room = 0
+  appendMessage = (input) ->
+    { user, message } = input
+    throw "Invalid value from server" unless user? && message?
+    $scope.messages.push { user, message }
 
-    socket.emit 'send', { user, message, room }
+chatApp.controller 'ChatCtrl', ['$scope', '$socket', ChatCtrl]

@@ -12,26 +12,30 @@ module.exports = (app, client, io) ->
 
   io.sockets.on 'connection', (socket) ->
 
-    socket.on 'initial', (data) ->
+    socket.on 'room:new', (data) ->
       { room } = data
-      client.lrange "room-#{room}", 0, 100, (err, data) ->
-        data = _.map data, (string) ->
+      client.lrange "room:id:#{room}", 0, 100, (err, data) ->
+        returnVal = _.map data, (string) ->
           user: string.substr(0, string.indexOf(' '))
           message: string.substr(string.indexOf(' ') + 1)
+        io.to(socket.id).emit "room:id:#{room}:initial", returnVal
 
-        io.to(socket.id).emit "room-#{room}", data
-
-    socket.on 'send', (data) ->
+    socket.on 'message:send', (data) ->
       { room, user, message } = data
-      return if !user? || user == ''
-      return if !message? || message == ''
-      client.rpush "room-#{room}", "#{user} #{message}", (err, res) ->
-        io.sockets.emit "room-#{room}", { user, message }
 
-    socket.on 'nuke', (data) ->
+      return unless goodInput(user) && goodInput(message)
+      user = user.trim()
+      message = message.trim()
+
+      client.rpush "room:id:#{room}", "#{user} #{message}", (err, res) ->
+        io.sockets.emit "room:id:#{room}", { user, message }
+
+    socket.on 'room:nuke', (data) ->
       { room, user } = data
-      client.del "room-#{room}", (err, res) ->
-        io.sockets.emit "nuked-#{room}", { user }
+      client.del "room:id:#{room}", (err, res) ->
+        io.sockets.emit "nuked:id:#{room}", { user }
 
 
+  # Helpers
+  goodInput = (string) -> string? && string.trim() != ''
 
