@@ -16,7 +16,7 @@
   },
   "devDependencies": {},
   "scripts": {
-    "start": "coffee server.coffee"
+    "start": "node server.js"
   },
   "engines": {
     "node": "0.10.17",

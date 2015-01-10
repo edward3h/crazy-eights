@@ -1,5 +1,5 @@
-#= require js/controllers.coffee
-#= require js/factories.coffee
+#= require javascripts/controllers.coffee
+#= require javascripts/factories.coffee
 
 angular.module 'chat-app', [
   'ngRoute'
