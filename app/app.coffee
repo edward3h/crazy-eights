@@ -1,8 +1,7 @@
-express =      require 'express.io'
+express =      require 'express'
 connect =      require 'connect-assets'
 autoprefixer = require 'express-autoprefixer'
 redis =        require 'redis'
-routes =       require './routes'
 io =           require 'socket.io'
 
 # Initialize Express and redis
@@ -10,23 +9,23 @@ exports.app = app = express()
 client = redis.createClient()
 
 # Determine port and environment
-port = process.env.PORT or 3000
-env = app.get 'env'
+PORT = 3000
+PORT_TEST = PORT + 1
 
 # all environments
 app.configure ->
-  app.set 'port', port
+  app.set 'port', process.env.PORT or PORT
   app.set 'views', "#{__dirname}/views"
   app.set 'view engine', 'jade'
   app.use express.favicon("#{__dirname}/public/favicon.ico")
-  app.use express.logger('dev')
+  app.use express.logger('dev') if app.get('env') is 'development'
   app.use express.bodyParser()
   app.use express.methodOverride()
 
   app.use autoprefixer
     browsers: 'last 5 versions'
     cascade: false
-  app.use connect()
+  app.use connect(src: "#{__dirname}/assets")
 
   app.use express.static("#{__dirname}/public")
   app.use app.router
@@ -34,8 +33,19 @@ app.configure ->
 # development only
 app.configure "development", ->
   app.use express.errorHandler()
+  # app.locals.pretty = true
 
-io = io.listen app.listen port, ->
+# test only
+app.configure 'test', ->
+  app.set 'port', PORT_TEST
+
+# listen
+io = io.listen app.listen app.get('port'), ->
+  port = app.get 'port'
+  env = app.settings.env
   console.log "Site running at port #{port} in #{env} mode"
 
-routes app, client, io
+# routes
+require('./config/routes')(app, client, io)
+
+module.exports = app

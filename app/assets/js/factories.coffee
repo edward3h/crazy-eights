@@ -1,6 +1,6 @@
-app = angular.module 'socketIO', []
+angular.module 'chat-app.factories', []
 
-app.factory '$socket', ($rootScope) ->
+.factory '$socket', ($rootScope) ->
   socket = io.connect("#{window.location.protocol}//#{window.location.host}")
   {
     on: (eventName, callback) ->

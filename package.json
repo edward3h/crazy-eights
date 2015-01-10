@@ -11,11 +11,12 @@
     "less": "1.7.5",
     "redis": "^0.12.1",
     "socket.io": "^1.2.1",
-    "underscore": "^1.7.0"
+    "underscore": "^1.7.0",
+    "underscore.string": "^2.4.0"
   },
   "devDependencies": {},
   "scripts": {
-    "start": "coffee app.coffee"
+    "start": "coffee server.coffee"
   },
   "engines": {
     "node": "0.10.17",

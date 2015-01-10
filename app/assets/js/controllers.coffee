@@ -1,4 +1,3 @@
-chatApp = angular.module 'chat-app', ['socketIO']
 
 ChatCtrl = ($scope, $socket) ->
   $scope.messages = []
@@ -6,6 +5,11 @@ ChatCtrl = ($scope, $socket) ->
   $scope.room = 0
 
   $socket.emit 'room:new', room: $scope.room
+
+  appendMessage = (input) ->
+    { user, message } = input
+    throw "Invalid value from server" unless user? && message?
+    $scope.messages.push { user, message }
 
   $socket.on "room:id:#{$scope.room}:initial", (data) ->
     throw "Invalid value from server" unless data instanceof Array
@@ -21,9 +25,6 @@ ChatCtrl = ($scope, $socket) ->
         room: $scope.room
       $scope.currentMessage = ''
 
-  appendMessage = (input) ->
-    { user, message } = input
-    throw "Invalid value from server" unless user? && message?
-    $scope.messages.push { user, message }
 
-chatApp.controller 'ChatCtrl', ['$scope', '$socket', ChatCtrl]
+angular.module 'chat-app.controllers', []
+.controller 'ChatCtrl', ['$scope', '$socket', ChatCtrl]

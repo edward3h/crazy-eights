@@ -2,13 +2,8 @@ _ = require 'underscore'
 
 # Routes file
 module.exports = (app, client, io) ->
-  # Universal Headers
-  app.get '*', (req, res, next) ->
-    res.header 'X-UA-Compatible', 'IE=edge'
-    next()
 
-  app.get '/', (req, res) ->
-    res.render 'index'
+  app.get '/', (req, res) -> res.render 'index', view: 'index'
 
   io.sockets.on 'connection', (socket) ->
 
