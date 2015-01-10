@@ -1,27 +1,4 @@
 extends layout
 
 block content
-  div(ng-controller="ChatCtrl")
-    h1 Room Number {{room}}
-
-    ul.messages
-      li.message(ng-repeat="message in messages")
-        .user {{message.user}}
-        .message {{message.message}}
-        .clearfix
-
-    .stuff
-
-    hr
-
-    form.chat(ng-submit="sendMessage()")
-
-      .user
-        label User:
-        input(type='text',name='user',ng-model='currentUser')
-
-      .message
-        label Message:
-        input(type='text',name='message',ng-model='currentMessage')
-
-      button.button(type='submit') click me
+  | <div ng-view></div>

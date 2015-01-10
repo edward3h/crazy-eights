@@ -1,8 +1,8 @@
 
-ChatCtrl = ($scope, $socket) ->
+ChatCtrl = ($scope, $socket, $routeParams) ->
   $scope.messages = []
 
-  $scope.room = 0
+  $scope.room = parseInt($routeParams.room, 10)
 
   $socket.emit 'room:new', room: $scope.room
 
@@ -25,6 +25,11 @@ ChatCtrl = ($scope, $socket) ->
         room: $scope.room
       $scope.currentMessage = ''
 
+MainCtrl = ($scope) ->
+  $scope.hi = "DUUUUUUUUUDE"
+
+
 
 angular.module 'chat-app.controllers', []
-.controller 'ChatCtrl', ['$scope', '$socket', ChatCtrl]
+.controller 'ChatCtrl', ['$scope', '$socket', '$routeParams', ChatCtrl]
+.controller 'MainCtrl', ['$scope', MainCtrl]

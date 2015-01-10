@@ -39,6 +39,10 @@ app.configure "development", ->
 app.configure 'test', ->
   app.set 'port', PORT_TEST
 
+autoload = require('./config/autoload')(app)
+autoload "#{__dirname}/assets/javascripts/shared", true
+autoload "#{__dirname}/controllers"
+
 # listen
 io = io.listen app.listen app.get('port'), ->
   port = app.get 'port'

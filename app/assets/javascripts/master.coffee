@@ -1,18 +1,22 @@
+#= require_tree shared
+
 #= require javascripts/controllers.coffee
 #= require javascripts/factories.coffee
 
-angular.module 'chat-app', [
+angular.module('chat-app', [
   'ngRoute'
   'chat-app.factories'
   'chat-app.controllers'
-]
-.config ($routeProvider, $locationProvider) ->
-  $routeProvider
+]).config ($routeProvider, $locationProvider) ->
 
+  $routeProvider
     .when '/',
-      templateUrl: 'index'
+      templateUrl: 'partials/main'
+      controller: 'MainCtrl'
+    .when '/:room',
+      templateUrl: 'partials/room'
       controller: 'ChatCtrl'
 
     .otherwise redirectTo: '/'
 
-  $locationProvider.html5Mode true
+  $locationProvider.html5Mode(true)

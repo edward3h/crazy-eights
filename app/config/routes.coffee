@@ -4,8 +4,21 @@ _s = require 'underscore.string'
 # Routes file
 module.exports = (app, client, io) ->
 
-  app.get '*', (req, res) -> res.render 'index', view: 'index'
+  # Load controllers and helpers
+  { PartialsController } = app.locals
+  { pathRaw } = app.locals.path
 
+  # Default page
+  app.locals.renderRoot = (req, res) -> res.render 'index', view: 'index'
+
+  # Routes for partials
+  app.get pathRaw('partial.show'), PartialsController.show
+
+  # Routes for SPA
+  app.get '/', app.locals.renderRoot
+  app.get '/:room', app.locals.renderRoot
+
+  # Socket IO
   io.sockets.on 'connection', (socket) ->
 
     socket.on 'room:new', (data) ->
