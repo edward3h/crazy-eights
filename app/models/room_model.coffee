@@ -1,115 +1,154 @@
 _ = require 'underscore'
 _s = require 'underscore.string'
-crypto = require 'crypto'
-shasum = crypto.createHash 'sha1'
 
 module.exports = (app) ->
+  { CardSetModel } = app.locals
+
   class RoomModel
-    constructor: (@id = null, @password = '') ->
-      @
+    players: []
+    playerCount: 0
+    currentPlayer: -1
+    gameStarted: false
 
-    # Create room
-    createRoom: (data, callback) ->
-      @id = Math.floor(Math.random() * 900000) + 100000
-      @exists (roomExists) =>
-        unless roomExists
-          @setPassword (authenticated) =>
-            if authenticated
-              app.client.set "room:id:#{@id}:exists", true, (err, data) =>
-                unless err? && err
-                  callback.call(@, error: false, room: @id)
+    deck: new CardSetModel()
+    pile: new CardSetModel()
 
-                # We got a Redis error
-                else callback.call(@, error: true, code: 3)
-
-            # We got a Redis error
-            else callback.call(@, error: true, code: 2)
-
-        # We got a room that already exists
-        else @createRoom(data, callback)
-
-    # Load room
-    loadRoom: (data, callback) ->
+    constructor: (@id, callback) ->
       @exists (roomExists) =>
         if roomExists
-          @authenticate (authenticated) =>
-            if authenticated
-              app.client.lrange "room:id:#{@id}", 0, 100, (err, messages) =>
-                returnVal = _.map messages, (string) ->
-                  user: _s.words(string)[0]
-                  message: _s.strRight(string, ' ')
-                callback.call(@, error: false, messages: returnVal)
+          app.client.hgetall "room:#{@id}", (err, room) =>
+            { @playerCount, @gameStarted, @currentPlayer, deck, pile } = room
+            @deck = new CardSetModel(deck)
+            @pile = new CardSetModel(pile)
+            _.times @playerCount, =>
+              @players.push new CardSetModel(room["player-#{index}"])
 
-            # We have the wrong password
-            else callback.call(@, error: true, code: 2)
+            callback.call(@, @roomState())
+        else
+          @createRoom => callback.call(@, @roomState())
+      @
+
+    # Add player
+    addPlayer: (data, callback) ->
+      @exists (roomExists) =>
+        if roomExists
+          unless @gameStarted
+
+            app.client.hincrby "room:#{@id}", playerCount, 1, (err, data) =>
+              app.client.hset "room:#{@id}", "player-#{@playerCount + 1}", '', (err, data) =>
+                @playerCount++
+                @players.push new CardSetModel()
+                callback.call(@, error: false, room: @roomState())
+
+          # The game has already started
+          else callback.call(@, error: true, code: 2)
 
         # We're loading a room that doesn't exist
         else callback.call(@, error: true, code: 1)
 
-    # Send a message in a room
-    sendMessage: (data, callback) ->
-      { user, message } = data
+    # Remove player
+    removePlayer: (data, callback) ->
+      { playerIndex } = data
       @exists (roomExists) =>
         if roomExists
-          @authenticate (authenticated) =>
-            if authenticated
-              user = _s.clean(user)
-              message = _s.clean(message)
-              app.client.rpush "room:id:#{@id}", "#{user} #{message}", (err, res) ->
-                unless err? && err
-                  callback.call(@, true)
-                else callback.call(@, false)
-            else callback.call(@, false)
-        else callback.call(@, false)
+          unless @gameStarted
+            app.client.hincrby "room:#{@id}", "playerCount", -1, (err, data) =>
+              app.client.hdel "room:#{@id}", "player-#{playerIndex}", (err, data) =>
+                @players.splice(playerIndex, 1)
+                @playerCount--
+                callback.call(@, error: false, room: @roomState())
 
-    # Nuke a room
-    nukeRoom: (data, callback) ->
+          # The game has already started
+          else callback.call(@, error: true, code: 2)
+
+        # We're loading a room that doesn't exist
+        else callback.call(@, error: true, code: 1)
+
+    # Start game
+    startGame: (data, callback) ->
       @exists (roomExists) =>
         if roomExists
-          @authenticate (authenticated) =>
-            if authenticated
-              app.client.del "room:id:#{@id} room:id:#{@id}:exists room:id:#{@id}:password", (err, res) ->
-                unless err? && err
-                  callback.call(@, true)
-                else callback.call(@, false)
-            else callback.call(@, false)
-        else callback.call(@, true)
+          unless @gameStarted
+            @gameStarted = true
+            @deck.getShuffledDeck()
+            _.each @players, (player) ->
+              _.times 8, ->
+                topCard = @deck.topCard()
+                player.addToSet(topCard)
+                @deck.removeCard(topCard)
+            @nextPlayer()
+
+            app.client.hmset "room:#{@id}", @roomHash(), (err, data) =>
+              callback.call(@, error: false, room: @roomState())
+
+          # The game has already started
+          else callback.call(@, error: true, code: 2)
+
+        # We're loading a room that doesn't exist
+        else callback.call(@, error: true, code: 1)
+
+    # Play card
+    playCard: (data, callback) ->
+      { playerIndex, card } = data
+      @exists (roomExists) =>
+        if roomExists
+          if @gameStarted && @players[playerIndex].hasCard(card)
+            if @pile.possibleNextMove(card)
+              @players[playerIndex].removeCard(card)
+              @pile.addCard(card)
+              @nextPlayer()
+
+              app.client.hmset "room:#{@id}", @roomHash(), (err, data) =>
+                callback.call(@, error: false, room: @roomState())
+
+            # Invalid move!
+            else callback.call(@, error: true, code: 3)
+
+          # Game inconsistency error
+          else callback.call(@, error: true, code: 2)
+
+        # We're loading a room that doesn't exist
+        else callback.call(@, error: true, code: 1)
 
     # Helpers
 
+    roomHash: ->
+      returnVal = {
+        @playerCount, @currentPlayer, @gameStarted
+        deck: @deck.getHand(), pile: @pile.getHand()
+      }
+      _.times @playerCount, (index) =>
+        returnVal["player-#{index}"] = players[index].getHand()
+
+      returnVal
+
+    roomState: ->
+      returnVal = {
+        @playerCount, @currentPlayer, @gameStarted
+        deck: @deck.getHand(), pile: @pile.getHand()
+      }
+      returnVal.players = []
+      _.times @playerCount, (index) =>
+        returnVal.players.push players[index].getHand()
+
+      returnVal
+
     exists: (callback) ->
       if @id
-        app.client.exists "room:id:#{@id}:exists", (err, exists) =>
+        app.client.exists "room:#{@id}", (err, exists) =>
           callback.call(@, exists == 1)
       else callback.call(@, false)
 
-    authenticate: (callback) ->
-      if @password != ''
-        hasPassword (serverPasswordExists) =>
-          if serverPasswordExists
-            app.client.get "room:id:#{@id}:password", (err, serverPassword) =>
-              callback.call(@, @saltedPassword(@password) == serverPassword)
-          else callback.call(@, true)
-      else callback.call(@, true)
+    createRoom: (data, callback) ->
+      @id = Math.floor(Math.random() * 90000) + 10000
+      @exists (roomExists) =>
+        unless roomExists
+          app.client.hmset "room:#{@id}", @roomHash(), (err, data) =>
+            callback.call(@)
 
-    hasPassword: (callback) ->
-      app.client.exists "room:id:#{@id}:password", (err, serverPasswordExists) =>
-        callback.call(@, serverPasswordExists == 1)
+        # We got a room that already exists
+        else @createRoom(data, callback)
 
-    setPassword: (callback) ->
-      if @password != ''
-        hasPassword (serverPasswordExists) =>
-          unless serverPasswordExists
-            app.client.set "room:id:#{@id}:password", @saltedPassword(@password), (err, res) =>
-              unless err? && err
-                callback.call(@, true)
-              else callback.call(@, false)
-          else callback.call(@, true)
-      else callback.call(@, true)
-
-    saltedPassword: (sha1) ->
-      salt = process.env.SUPER_SECRET_SALT or 'super_not_secret_salt'
-      shasum.update "#{salt}#{sha1}#{salt}"
-      shasum.digest 'hex'
-
+    nextPlayer: ->
+      @currentPlayer = (@currentPlayer + 1) % @playerCount
 

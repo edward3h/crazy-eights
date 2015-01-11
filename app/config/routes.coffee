@@ -26,6 +26,13 @@ module.exports = (app) ->
   app.io.sockets.on 'connection', (socket) ->
     { RoomModel } = app.locals
 
+    # User wants to join with a username
+    socket.on 'room:join', (data) =>
+      {  }
+
+    # handle disconnects
+
+    # playing a move
     socket.on 'message:send', (data) =>
       { room, password, user, message } = data
 

@@ -4,21 +4,15 @@ module.exports = (app) ->
 
   class RoomController
 
-    # Expects password
-    # Returns room id
+    # Returns room state
     @create: (req, res) ->
-      { password } = req.body
-
-      model = new RoomModel(null, password)
-      model.createRoom {}, (data) =>
+      model = new RoomModel null, (data) ->
         res.json(data)
 
-    # Expects room ID and (optional) password
-    # Returns last 100 messages
+    # Expects room ID
+    # Returns room state
     @show: (req, res) ->
       { roomid } = req.params
-      { password } = req.query
 
-      model = new RoomModel(roomid, password)
-      model.loadRoom {}, (data) =>
+      model = new RoomModel roomid, (data) ->
         res.json(data)
