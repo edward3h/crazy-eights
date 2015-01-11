@@ -26,19 +26,25 @@ module.exports = (app) ->
   app.io.sockets.on 'connection', (socket) ->
     { RoomModel } = app.locals
 
-    socket.on 'message:send', (data) ->
-      { room, user, message } = data
+    socket.on 'message:send', (data) =>
+      { room, password, user, message } = data
 
       return if _s.isBlank(user) && _s.isBlank(message)
-      user = _s.clean(user)
-      message = _s.clean(message)
 
-      app.client.rpush "room:id:#{room}", "#{user} #{message}", (err, res) ->
-        app.io.sockets.emit "room:id:#{room}", { user, message }
+      model = new RoomModel(room, password)
+      model.sendMessage { user, message }, (sent) =>
+        if sent
+          app.io.sockets.emit "room:id:#{room}", { user, message }
+        else
+          app.io.sockets.socket(socket.id).emit "room:id:#{room}:message:error", { code: 1 }
 
-    socket.on 'room:nuke', (data) ->
-      { room, user } = data
-      app.client.del "room:id:#{room}", (err, res) ->
-        app.io.sockets.emit "nuked:id:#{room}", { user }
+    socket.on 'room:nuke', (data) =>
+      { room, password, user } = data
 
+      model = new RoomModel(room, password)
+      model.nukeRoom (nuked) =>
+        if nuked
+          app.io.sockets.emit "room:id:#{room}:nuked", { user }
+        else
+          app.io.sockets.socket(socket.id).emit "room:id:#{room}:nuke:error", { code: 2 }
 

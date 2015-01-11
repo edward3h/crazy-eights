@@ -1,4 +1,59 @@
 
+// Font Import
+@import url("http://fonts.googleapis.com/css?family=Slabo+27px|Roboto:400,500");
+
+ul, ol {
+  margin: 0;
+  padding: 0;
+}
+
+li {
+  list-style: none;
+}
+
+html {
+  height: 100%;
+  overflow: visible;
+}
+
+body {
+  min-width: 320px;
+  font-family: "Roboto", sans-serif;
+  height: 100%;
+  overflow: visible;
+  -webkit-overflow-scrolling: touch;
+  background-color: #aaa;
+}
+
+
+.chat-room {
+  .container {
+    max-width: 500px;
+    min-height: 100%;
+    background-color: #fff;
+  }
+
+  .title {
+    font-family: "Slabo 27px", sans-serif;
+    text-align: right;
+    color: #666;
+    .room {
+      color: #000;
+    }
+  }
+
+
+}
+
+
+
+
+
+
+
+
+
+
 
 .clearfix {
   clear: both;
@@ -8,19 +63,66 @@
 ul.messages {
   margin: 0;
   padding: 0;
+  font-size: 15px;
 
-  li {
-    list-style: none;
-    padding: 5px;
-    border-bottom: 1px solid #000;
+  li.empty-message {
+
+  }
+
+  li.title-bar {
+    padding: 0 5px;
+    font-size: 14px;
+    text-transform: uppercase;
+    color: #666;
     .user {
-      width: 10%;
+      width: 20%;
       float: left;
     }
     .message {
-      width: 90%;
-      float: right;
+      width: 80%;
+      float: left;
     }
+  }
+
+  li.message {
+    padding: 5px;
+    border-bottom: 1px solid #000;
+    .user {
+      width: 20%;
+      float: left;
+    }
+    .message {
+      width: 80%;
+      float: left;
+    }
+  }
+
+  li.new-message {
+    border-bottom: 1px solid #000;
+    input, button {
+      border: 0;
+      padding: 5px;
+      margin: 0;
+
+      width: 100%;
+    }
+    form {
+      margin: 0;
+      padding: 0;
+    }
+    .user {
+      width: 20%;
+      float: left;
+    }
+    .message {
+      width: 70%;
+      float: left;
+    }
+    .send {
+      width: 10%;
+      float: left;
+    }
+
   }
 
 }

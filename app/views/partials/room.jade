@@ -15,26 +15,31 @@
 
 
 .chat-room(ng-hide="errors.doesNotExist || errors.enterPassword || errors.wrongPassword || loading")
-  h1 Room Number {{room}}
+  .container
 
-  ul.messages
-    li.message(ng-repeat="message in messages")
-      .user {{message.user}}
-      .message {{message.message}}
-      .clearfix
+    h1.title Room #<span class='room'>{{room}}</span>
 
-  .stuff
+    ul.messages
+      li.title-bar
+        .user User
+        .message Message
+        .clearfix
 
-  hr
+      li.message(ng-repeat="message in messages")
+        .user {{message.user}}
+        .message {{message.message}}
+        .clearfix
 
-  form.chat(ng-submit="sendMessage()")
+      li.new-message
 
-    .user
-      label User:
-      input(type='text',name='user',ng-model='currentUser')
+        form(ng-submit="sendMessage()")
 
-    .message
-      label Message:
-      input(type='text',name='message',ng-model='currentMessage')
+          .user
+            input(type='text',name='user',ng-model='currentUser')
 
-    button.button(type='submit') click me
+          .message
+            input(type='text',name='message',ng-model='currentMessage')
+
+          button.send(type='submit') send
+
+          .clearfix
