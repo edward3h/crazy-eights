@@ -1,3 +1,5 @@
+#= require vendor/angular/angular.min.js
+
 angular.module 'chat-app.factories', []
 
 .factory '$socket', ($rootScope) ->

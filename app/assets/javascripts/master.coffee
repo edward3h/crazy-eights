@@ -1,5 +1,8 @@
 #= require_tree shared
 
+#= require vendor/angular/angular.min.js
+#= require vendor/angular-route/angular-route.min.js
+
 #= require javascripts/controllers.coffee
 #= require javascripts/factories.coffee
 

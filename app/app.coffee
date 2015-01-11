@@ -6,7 +6,7 @@ io =           require 'socket.io'
 
 # Initialize Express and redis
 exports.app = app = express()
-client = redis.createClient()
+app.client = client = redis.createClient()
 
 # Determine port and environment
 PORT = 3000
@@ -41,15 +41,16 @@ app.configure 'test', ->
 
 autoload = require('./config/autoload')(app)
 autoload "#{__dirname}/assets/javascripts/shared", true
+autoload "#{__dirname}/models"
 autoload "#{__dirname}/controllers"
 
 # listen
-io = io.listen app.listen app.get('port'), ->
+app.io = io = io.listen app.listen app.get('port'), ->
   port = app.get 'port'
   env = app.settings.env
   console.log "Site running at port #{port} in #{env} mode"
 
 # routes
-require('./config/routes')(app, client, io)
+require('./config/routes')(app)
 
 module.exports = app

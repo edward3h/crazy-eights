@@ -2,32 +2,29 @@ _ = require 'underscore'
 _s = require 'underscore.string'
 
 # Routes file
-module.exports = (app, client, io) ->
+module.exports = (app) ->
 
   # Load controllers and helpers
-  { PartialsController } = app.locals
+  { PartialsController, RoomController } = app.locals
   { pathRaw } = app.locals.path
 
   # Default page
   app.locals.renderRoot = (req, res) -> res.render 'index', view: 'index'
 
+  # API routes
+  app.post pathRaw('room.create'), RoomController.create
+  app.get pathRaw('room.show'), RoomController.show
+
   # Routes for partials
   app.get pathRaw('partial.show'), PartialsController.show
 
   # Routes for SPA
-  app.get '/', app.locals.renderRoot
+  app.get '/',      app.locals.renderRoot
   app.get '/:room', app.locals.renderRoot
 
   # Socket IO
-  io.sockets.on 'connection', (socket) ->
-
-    socket.on 'room:new', (data) ->
-      { room } = data
-      client.lrange "room:id:#{room}", 0, 100, (err, data) ->
-        returnVal = _.map data, (string) ->
-          user: _s.words(string)[0]
-          message: _s.strRight(string, ' ')
-        io.to(socket.id).emit "room:id:#{room}:initial", returnVal
+  app.io.sockets.on 'connection', (socket) ->
+    { RoomModel } = app.locals
 
     socket.on 'message:send', (data) ->
       { room, user, message } = data
@@ -36,12 +33,12 @@ module.exports = (app, client, io) ->
       user = _s.clean(user)
       message = _s.clean(message)
 
-      client.rpush "room:id:#{room}", "#{user} #{message}", (err, res) ->
-        io.sockets.emit "room:id:#{room}", { user, message }
+      app.client.rpush "room:id:#{room}", "#{user} #{message}", (err, res) ->
+        app.io.sockets.emit "room:id:#{room}", { user, message }
 
     socket.on 'room:nuke', (data) ->
       { room, user } = data
-      client.del "room:id:#{room}", (err, res) ->
-        io.sockets.emit "nuked:id:#{room}", { user }
+      app.client.del "room:id:#{room}", (err, res) ->
+        app.io.sockets.emit "nuked:id:#{room}", { user }
 
 

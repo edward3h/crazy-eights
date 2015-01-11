@@ -1,23 +1,40 @@
-h1 Room Number {{room}}
 
-ul.messages
-  li.message(ng-repeat="message in messages")
-    .user {{message.user}}
-    .message {{message.message}}
-    .clearfix
+.loading(ng-show='loading')
 
-.stuff
 
-hr
+.error.does-not-exist(ng-show='errors.doesNotExist')
+  h3 This group does not exist!
+  button(ng-click='goHome()') Go Home
 
-form.chat(ng-submit="sendMessage()")
+.error.password(ng-show='errors.enterPassword || errors.wrongPassword')
+  h3(ng-show='errors.enterPassword') This room is password protected! Enter the password below
+  h3(ng-show='errors.wrongPassword') You've entered the wrong password!
+  form.password-form(ng-submit='loadRoom()')
+    input(type='password',ng-model='password')
+    button(type='submit') Enter Group
 
-  .user
-    label User:
-    input(type='text',name='user',ng-model='currentUser')
 
-  .message
-    label Message:
-    input(type='text',name='message',ng-model='currentMessage')
+.chat-room(ng-hide="errors.doesNotExist || errors.enterPassword || errors.wrongPassword || loading")
+  h1 Room Number {{room}}
 
-  button.button(type='submit') click me
+  ul.messages
+    li.message(ng-repeat="message in messages")
+      .user {{message.user}}
+      .message {{message.message}}
+      .clearfix
+
+  .stuff
+
+  hr
+
+  form.chat(ng-submit="sendMessage()")
+
+    .user
+      label User:
+      input(type='text',name='user',ng-model='currentUser')
+
+    .message
+      label Message:
+      input(type='text',name='message',ng-model='currentMessage')
+
+    button.button(type='submit') click me
