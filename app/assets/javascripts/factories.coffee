@@ -1,6 +1,6 @@
 #= require vendor/angular/angular.min.js
 
-angular.module 'chat-app.factories', []
+angular.module 'crazy-eights.factories', []
 
 .factory '$socket', ($rootScope) ->
   socket = io.connect("#{window.location.protocol}//#{window.location.host}")

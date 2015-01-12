@@ -25,33 +25,56 @@ module.exports = (app) ->
   # Socket IO
   app.io.sockets.on 'connection', (socket) ->
     { RoomModel } = app.locals
+    roomid = 0
+    username = ''
 
-    # User wants to join with a username
-    socket.on 'room:join', (data) =>
-      {  }
+    updateEveryone = (data) ->
+      { error, code, room } = data
+      if error
+        socket.emit 'room:#{roomid}:error', { code }
+      else
+        socket.emit "room:#{roomid}:update", { room }
 
     # handle disconnects
+    socket.on 'disconnect', ->
+      if roomid && username
+        model = new RoomModel roomid, (roomState) ->
+          @disconnect { username }, updateEveryone
 
-    # playing a move
-    socket.on 'message:send', (data) =>
-      { room, password, user, message } = data
+    # User wants to join with a username
+    socket.on 'room:join', (data) ->
+      { joiningRoomid, joiningUsername } = data
+      model = new RoomModel roomid, (roomState) ->
+        roomid = joiningRoomid
+        username = joiningUsername
+        @addPlayer { username }, updateEveryone
 
-      return if _s.isBlank(user) && _s.isBlank(message)
+    # Leave room
+    socket.on 'room:unjoin', (data) ->
+      model = new RoomModel roomid, (roomState) ->
+        @removePlayer { username }, (data) ->
+          roomid = 0
+          username = ''
+          updateEveryone(data)
 
-      model = new RoomModel(room, password)
-      model.sendMessage { user, message }, (sent) =>
-        if sent
-          app.io.sockets.emit "room:id:#{room}", { user, message }
-        else
-          app.io.sockets.socket(socket.id).emit "room:id:#{room}:message:error", { code: 1 }
+    # Start a game
+    socket.on 'room:start', (data) ->
+      model = new RoomModel roomid, (roomState) ->
+        @startGame { username }, updateEveryone
 
-    socket.on 'room:nuke', (data) =>
-      { room, password, user } = data
+    # Play a card
+    socket.on 'room:card:play', (data) ->
+      { card } = data
+      model = new RoomModel roomid, (roomState) ->
+        @playCard { username, card }, updateEveryone
 
-      model = new RoomModel(room, password)
-      model.nukeRoom (nuked) =>
-        if nuked
-          app.io.sockets.emit "room:id:#{room}:nuked", { user }
-        else
-          app.io.sockets.socket(socket.id).emit "room:id:#{room}:nuke:error", { code: 2 }
+    # Draw a card
+    socket.on 'room:card:draw', (data) ->
+      model = new RoomModel roomid, (roomState) ->
+        @drawCard { username }, updateEveryone
+
+    # Skip a turn
+    socket.on 'room:card:skip', (data) ->
+      model = new RoomModel roomid, (roomState) ->
+        @skipTurn { username }, updateEveryone
 

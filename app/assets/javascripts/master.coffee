@@ -6,10 +6,10 @@
 #= require javascripts/controllers.coffee
 #= require javascripts/factories.coffee
 
-angular.module('chat-app', [
+angular.module('crazy-eights', [
   'ngRoute'
-  'chat-app.factories'
-  'chat-app.controllers'
+  'crazy-eights.factories'
+  'crazy-eights.controllers'
 ]).config ($routeProvider, $locationProvider) ->
 
   $routeProvider

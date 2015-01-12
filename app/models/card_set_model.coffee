@@ -11,14 +11,13 @@ module.exports = (app) ->
       @
 
     getHand: -> @hand
+    isActive: -> @hand != ''
 
     addCard: (card) ->
       @set += card if validateCard(card)
 
-    playCard: (card) ->
+    removeCard: (card) ->
       _.without(_s.chop(@set, 2), card).join '' if validateCard(card)
-
-    removeCard: @playCard
 
     hasCard: (card) ->
       _.contains(_s.chop(@set, 2), card) if validateCard(card)

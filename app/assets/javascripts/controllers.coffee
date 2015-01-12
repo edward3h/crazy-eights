@@ -2,7 +2,7 @@
 #= require vendor/angular/angular.min.js
 #= require vendor/angular-route/angular-route.min.js
 
-angular.module 'chat-app.controllers', []
+angular.module 'crazy-eights.controllers', []
 
 .controller 'ChatCtrl', ['$scope', '$socket', '$http', '$routeParams', '$location',
   ($scope, $socket, $http, $routeParams, $location) ->
@@ -13,10 +13,6 @@ angular.module 'chat-app.controllers', []
       room: $routeParams.room
       password: ''
       loading: true
-      errors:
-        doesNotExist: false
-        enterPassword: false
-        wrongPassword: false
 
     appendMessage = (input) ->
       { user, message } = input
@@ -30,22 +26,10 @@ angular.module 'chat-app.controllers', []
       _.extend data, { password } if password
       $http.get("/rooms/#{room}", data)
       .success (data, status, headers, config) ->
-        if data.error
-          switch data.code
-            when 1
-              $scope.errors.doesNotExist = true
-            when 2
-              if $scope.errors.enterPassword && !$scope.errors.wrongPassword
-                $scope.errors.enterPassword = false
-                $scope.errors.wrongPassword = true
-              else
-                $scope.errors.enterPassword = false
-          $scope.loading = false
-        else
-          $scope.room = parseInt(room, 10)
-          appendMessage(item) for item in data.messages
-          $scope.loading = false
-          $socket.on "room:id:#{$scope.room}", appendMessage
+        $scope.room = parseInt(room, 10)
+        appendMessage(item) for item in data.messages
+        $scope.loading = false
+        $socket.on "room:id:#{$scope.room}", appendMessage
     )()
 
     $scope.sendMessage = ->
