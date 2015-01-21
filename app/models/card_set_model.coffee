@@ -23,7 +23,7 @@ module.exports = (app) ->
       _.contains(_s.chop(@set, 2), card) if validateCard(card)
 
     topCard: ->
-      array = _s.chop set, 2
+      array = _s.chop(@set, 2) || []
       array[array.length - 1] || null
 
     getShuffledDeck: ->

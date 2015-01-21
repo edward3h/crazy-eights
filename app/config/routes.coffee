@@ -29,29 +29,30 @@ module.exports = (app) ->
     username = ''
 
     updateEveryone = (data) ->
+      console.log "updating everyone in room #{roomid} with #{data}"
       { error, code, room } = data
       if error
         socket.emit 'room:#{roomid}:error', { code }
       else
-        socket.emit "room:#{roomid}:update", { room }
+        socket.emit "room:#{roomid}:update", { room, username }
 
     # handle disconnects
     socket.on 'disconnect', ->
       if roomid && username
-        model = new RoomModel roomid, (roomState) ->
+        new RoomModel roomid, (roomState) ->
           @disconnect { username }, updateEveryone
 
     # User wants to join with a username
     socket.on 'room:join', (data) ->
       { joiningRoomid, joiningUsername } = data
-      model = new RoomModel roomid, (roomState) ->
+      new RoomModel roomid, (roomState) ->
         roomid = joiningRoomid
         username = joiningUsername
         @addPlayer { username }, updateEveryone
 
     # Leave room
     socket.on 'room:unjoin', (data) ->
-      model = new RoomModel roomid, (roomState) ->
+      new RoomModel roomid, (roomState) ->
         @removePlayer { username }, (data) ->
           roomid = 0
           username = ''
@@ -59,22 +60,22 @@ module.exports = (app) ->
 
     # Start a game
     socket.on 'room:start', (data) ->
-      model = new RoomModel roomid, (roomState) ->
+      new RoomModel roomid, (roomState) ->
         @startGame { username }, updateEveryone
 
     # Play a card
     socket.on 'room:card:play', (data) ->
       { card } = data
-      model = new RoomModel roomid, (roomState) ->
+      new RoomModel roomid, (roomState) ->
         @playCard { username, card }, updateEveryone
 
     # Draw a card
     socket.on 'room:card:draw', (data) ->
-      model = new RoomModel roomid, (roomState) ->
+      new RoomModel roomid, (roomState) ->
         @drawCard { username }, updateEveryone
 
     # Skip a turn
     socket.on 'room:card:skip', (data) ->
-      model = new RoomModel roomid, (roomState) ->
+      new RoomModel roomid, (roomState) ->
         @skipTurn { username }, updateEveryone
 

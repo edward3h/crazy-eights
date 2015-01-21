@@ -10,39 +10,57 @@ angular.module 'crazy-eights.controllers', []
     # Initial scope
     _.extend $scope,
       messages: []
-      room: $routeParams.room
-      password: ''
+      room: parseInt($routeParams.room, 10)
       loading: true
-
-    appendMessage = (input) ->
-      { user, message } = input
-      throw "Invalid value from server" unless user? && message?
-      $scope.messages.push { user, message }
+      login: false
 
     ($scope.loadRoom = ->
       $scope.loading = true
-      { room, password } = $scope
-      data = {}
-      _.extend data, { password } if password
-      $http.get("/rooms/#{room}", data)
+      $http.get("/rooms/#{$scope.room}")
       .success (data, status, headers, config) ->
-        $scope.room = parseInt(room, 10)
-        appendMessage(item) for item in data.messages
-        $scope.loading = false
-        $socket.on "room:id:#{$scope.room}", appendMessage
+        { room } = data
+        _.extend $scope,
+          room: room
+          loading: false
+          login: true
+
+        $location.url "/#{room}"
     )()
 
-    $scope.sendMessage = ->
-      console.log 'SENDING MESSAGE'
-      if $scope.currentMessage && $scope.currentUser
-        $socket.emit 'message:send',
-          user: $scope.currentUser
-          message: $scope.currentMessage
-          room: $scope.room
-        $scope.currentMessage = ''
+    $scope.joinRoom = ->
+      return unless $scope.login
+      console.log "joining room #{$scope.room} with username #{$scope.username}"
+      console.log "subscribing to room:#{$scope.room}:error"
+      $socket.on "room:#{$scope.room}:error", (data) ->
+        console.log 'Error has occurred'
+        loadError(data.code)
+      console.log "subscribing to room:#{$scope.room}:update"
+      $socket.on "room:#{$scope.room}:update", (data) ->
+        console.log 'Updating room'
+        $scope.roomInfo = data.room
+        console.log $scope.room
+      $socket.emit 'room:join', { joiningRoomid: $scope.room, joiningUsername: $scope.username }
+      $scope.login = false
+      console.log $scope.room
 
-    $scope.goHome = ->
-      $location.url '/'
+
+
+
+
+
+
+
+
+    loadError = (code) ->
+      switch code
+        when 10, 20, 30, 40, 50, 60, 70
+          $scope.error = 'hi doesnt exist lol'
+        else
+          $scope.error = 'lulz error'
+
+    $scope.closeError = ->
+      $scope.error = ''
+
 
 ]
 
@@ -54,7 +72,7 @@ angular.module 'crazy-eights.controllers', []
 
     $scope.createRoom = ->
 
-      $http.post('/rooms', password: $scope.password)
+      $http.post('/rooms')
       .success (data, status, headers, config) ->
         { error, code, room } = data
 

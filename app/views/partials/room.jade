@@ -3,12 +3,17 @@
   .container
     h1.title Loading
 
+.login(ng-show='login',ng-hide='loading')
+  .container
+    form(ng-submit='joinRoom()')
+        input(type='text',ng-model='username')
+        button.send(type='submit') join
 
 
-.chat-room(ng-hide="loading")
+.chat-room(ng-hide='login || loading')
   .container
 
-    h1.title Room #<span class='room'>{{room}}</span>
+    h1.title Room #<span class='room'>{{roomInfo.room}}</span>
 
 
 

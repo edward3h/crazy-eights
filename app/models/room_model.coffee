@@ -235,6 +235,7 @@ module.exports = (app) ->
 
     roomState: ->
       returnVal = {
+        room: @id
         @playerCount, @currentPlayer
         deck: @deck.topCard(), pile: @pile.topCard()
         @playerNames, @playerGameStarted, @playerGameWon
@@ -251,7 +252,7 @@ module.exports = (app) ->
           callback.call(@, exists == 1)
       else callback.call(@, false)
 
-    createRoom: (data, callback) ->
+    createRoom: (callback) ->
       @id = Math.floor(Math.random() * 90000) + 10000
       @exists (roomExists) =>
         unless roomExists
@@ -259,7 +260,7 @@ module.exports = (app) ->
             callback.call(@)
 
         # We got a room that already exists
-        else @createRoom(data, callback)
+        else @createRoom(callback)
 
     nextPlayer: ->
       @currentPlayer = (@currentPlayer + 1) % @playerCount
