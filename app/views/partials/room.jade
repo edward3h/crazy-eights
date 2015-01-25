@@ -17,7 +17,8 @@
   .title-pane
     h1.title Crazy Eights
   .left-pane.player-list
-    h3.message Players
+    h3.message(ng-hide='roomInfo.playerCount == 0') Players
+    h3.message(ng-show='roomInfo.playerCount == 0') No Players!
     ul
       li(ng-repeat='playerName in roomInfo.playerNames',
         ng-class='{"current-user": $index == playerIndex, "current-player": roomInfo.gameState == "started" && $index == roomInfo.currentPlayer,"wants-to-start": roomInfo.gameState == "notstarted" && roomInfo.playerGameStarted[$index]}')
@@ -58,9 +59,17 @@
             a(href='#',ng-click='playCard(playerCard)')
               img.card(ng-src='/images/cards/{{playerCard}}.png')
 
+    .overlay.error(ng-show='error != ""')
+      .contents
+        a.close.fa.fa-close(href='#',ng-click='error = ""',ng-hide='fatal')
+        .message {{error}}
+
+    .overlay.winner(ng-show='roomInfo.gameState == "ended"')
+      .contents
+        a.close.fa.fa-close(href='#',ng-click='error = ""',ng-hide='fatal')
+        .message We have a winner!
 
 
-.error(ng-show="error != ''")
 
 
 

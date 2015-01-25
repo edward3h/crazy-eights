@@ -3,10 +3,18 @@ connect =      require 'connect-assets'
 autoprefixer = require 'express-autoprefixer'
 redis =        require 'redis'
 io =           require 'socket.io'
+url =          require 'url'
 
-# Initialize Express and redis
+# Express
 exports.app = app = express()
-app.client = client = redis.createClient()
+
+# Redis
+if process.env.REDISCLOUD_URL
+  redisCloud = url.parse(process.env.REDISCLOUD_URL)
+  app.client = client = redis.createClient(redisCloud.port, redisCloud.hostname)
+  client.auth(redisCloud.auth.split(':')[1])
+else
+  app.client = client = redis.createClient()
 
 # Determine port and environment
 PORT = 3000

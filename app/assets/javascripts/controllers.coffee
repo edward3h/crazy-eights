@@ -14,6 +14,7 @@ angular.module 'crazy-eights.controllers', []
       room: parseInt($routeParams.room, 10)
       loading: true
       login: false
+      error: ''
 
     ($scope.loadRoom = ->
       $scope.loading = true
@@ -63,6 +64,7 @@ angular.module 'crazy-eights.controllers', []
           $timeout ( -> $scope.invalidMove = false ), 2000
         when 10, 20, 30, 40, 50, 60, 70
           $scope.error = 'doesnt exist lol'
+          $scope.fatal = true
         else
           $scope.error = 'some unknown error lol'
 
@@ -80,12 +82,6 @@ angular.module 'crazy-eights.controllers', []
         playerWon: room.playerGameWon[$scope.playerIndex]
 
       $scope.roomInfo = room
-
-
-
-    $scope.closeError = ->
-      $scope.error = ''
-
 
 ]
 

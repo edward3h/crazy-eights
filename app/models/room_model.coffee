@@ -152,7 +152,7 @@ module.exports = (app) ->
                       unless @playerCards[playerIndex].isActive()
                         @playerGameWon[playerIndex] = _.max(@playerGameWon) + 1
 
-                      if _.all(@playerGameWon)
+                      if _.select(@playerGameWon, ( (i) -> i )).length == 1
                         @gameState = 'ended'
                         app.client.del "room:#{@id}", (err, data) =>
                           callback.call(@, error: false, room: @roomState())
