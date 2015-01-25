@@ -4,40 +4,50 @@ _s = require 'underscore.string'
 module.exports = (app) ->
   class CardSetModel
 
-    POSSIBLE_SUITS: ['s', 'c', 'd', 'h']
-    POSSIBLE_NUMBERS: ['a', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'j', 'q', 'k']
+    POSSIBLE_SUITS: 'scdh'.split('')
+    POSSIBLE_NUMBERS: 'a234567890jqk'.split('')
 
     constructor: (@set = '') ->
       @
 
-    getHand: -> @hand
-    isActive: -> @hand != ''
+    getSet: -> @set
+    isActive: -> @set != ''
 
     addCard: (card) ->
-      @set += card if validateCard(card)
+      @set += card if @validateCard(card)
 
     removeCard: (card) ->
-      _.without(_s.chop(@set, 2), card).join '' if validateCard(card)
+      @set = _.without(_s.chop(@set, 2), card).join '' if @validateCard(card)
+      card
+
+    popCard: ->
+      card = @set.substr(-2)
+      @set = @set.substr(0, @set.length - 2)
+      card
 
     hasCard: (card) ->
-      _.contains(_s.chop(@set, 2), card) if validateCard(card)
+      if @validateCard(card)
+        _.contains(_s.chop(@set, 2), card)
+      else
+        false
 
     topCard: ->
       array = _s.chop(@set, 2) || []
-      array[array.length - 1] || null
+      array[array.length - 1] || ''
 
     getShuffledDeck: ->
       deck = []
-      _.each CardHelper.POSSIBLE_SUITS, (suit) ->
-        _.each CardHelper.POSSIBLE_NUMBERS, (number) ->
+      for suit in @POSSIBLE_SUITS
+        for number in @POSSIBLE_NUMBERS
           deck.push "#{suit}#{number}"
       @set = _.shuffle(deck).join ''
 
     validateCard: (card) ->
-      _.contains(POSSIBLE_SUITS, card.charAt(0)) &&
-      _.contains(POSSIBLE_NUMBERS, card.charAt(1))
+      _.contains(@POSSIBLE_SUITS, card.charAt(0)) &&
+      _.contains(@POSSIBLE_NUMBERS, card.charAt(1))
 
     possibleNextMove: (card) ->
-      validateCard(card) &&
-      (card.charAt(0) == @topCard().charAt(0) ||
+      @validateCard(card) &&
+      (@set == '' ||
+      card.charAt(0) == @topCard().charAt(0) ||
       card.charAt(1) == @topCard().charAt(1))

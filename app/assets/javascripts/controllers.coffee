@@ -1,11 +1,12 @@
 #= require vendor/underscore/underscore-min.js
+#= require vendor/underscore.string/dist/underscore.string.min.js
 #= require vendor/angular/angular.min.js
 #= require vendor/angular-route/angular-route.min.js
 
 angular.module 'crazy-eights.controllers', []
 
-.controller 'ChatCtrl', ['$scope', '$socket', '$http', '$routeParams', '$location',
-  ($scope, $socket, $http, $routeParams, $location) ->
+.controller 'ChatCtrl', ['$scope', '$socket', '$http', '$routeParams', '$location', '$timeout'
+  ($scope, $socket, $http, $routeParams, $location, $timeout) ->
 
     # Initial scope
     _.extend $scope,
@@ -29,34 +30,58 @@ angular.module 'crazy-eights.controllers', []
 
     $scope.joinRoom = ->
       return unless $scope.login
-      console.log "joining room #{$scope.room} with username #{$scope.username}"
-      console.log "subscribing to room:#{$scope.room}:error"
-      $socket.on "room:#{$scope.room}:error", (data) ->
-        console.log 'Error has occurred'
-        loadError(data.code)
-      console.log "subscribing to room:#{$scope.room}:update"
-      $socket.on "room:#{$scope.room}:update", (data) ->
-        console.log 'Updating room'
-        $scope.roomInfo = data.room
-        console.log $scope.room
+      $socket.on "room:#{$scope.room}:error", loadError
+      $socket.on "room:#{$scope.room}:update", loadRoomData
       $socket.emit 'room:join', { joiningRoomid: $scope.room, joiningUsername: $scope.username }
       $scope.login = false
-      console.log $scope.room
 
+    $scope.startGame = ->
+      return if $scope.login
+      $socket.emit 'room:start'
 
+    $scope.playCard = (card) ->
+      return if $scope.login
+      return unless $scope.playerIndex == $scope.roomInfo.currentPlayer
+      $socket.emit 'room:card:play', { card }
 
+    $scope.drawCard = ->
+      return if $scope.login
+      return unless $scope.playerIndex == $scope.roomInfo.currentPlayer
+      $socket.emit 'room:card:draw'
 
+    $scope.skipTurn = ->
+      return if $scope.login
+      return unless $scope.playerIndex == $scope.roomInfo.currentPlayer
+      $socket.emit 'room:card:skip'
 
-
-
-
-
-    loadError = (code) ->
+    loadError = (data) ->
+      { code } = data
+      console.log 'received ERROR', code
       switch code
+        when 46
+          $scope.invalidMove = true
+          $timeout ( -> $scope.invalidMove = false ), 2000
         when 10, 20, 30, 40, 50, 60, 70
-          $scope.error = 'hi doesnt exist lol'
+          $scope.error = 'doesnt exist lol'
         else
-          $scope.error = 'lulz error'
+          $scope.error = 'some unknown error lol'
+
+    loadRoomData = (data) ->
+      { room } = data
+      console.log "received update", room
+      $scope.playerIndex = room.playerNames.indexOf($scope.username)
+
+      $scope.isMyTurn = (room.currentPlayer == $scope.playerIndex)
+
+      $scope.myProperties =
+        playerCards: _.str.chop(room.playerCards[$scope.playerIndex], 2)
+        playerName: room.playerNames[$scope.playerIndex]
+        playerStarted: room.playerGameStarted[$scope.playerIndex]
+        playerWon: room.playerGameWon[$scope.playerIndex]
+
+      $scope.roomInfo = room
+
+
 
     $scope.closeError = ->
       $scope.error = ''
@@ -66,9 +91,6 @@ angular.module 'crazy-eights.controllers', []
 
 .controller 'MainCtrl', ['$scope', '$http', '$location',
   ($scope, $http, $location) ->
-    $scope.hi = "DUUUUUUUUUDE"
-
-
 
     $scope.createRoom = ->
 

@@ -29,53 +29,65 @@ module.exports = (app) ->
     username = ''
 
     updateEveryone = (data) ->
-      console.log "updating everyone in room #{roomid} with #{data}"
       { error, code, room } = data
       if error
-        socket.emit 'room:#{roomid}:error', { code }
+        console.log "Emmitting room:#{roomid}:error"
+        console.log { code }
+        app.io.emit "room:#{roomid}:error", { code }
       else
-        socket.emit "room:#{roomid}:update", { room, username }
+        console.log "Emmitting room:#{roomid}:update"
+        console.log { room }
+        app.io.emit "room:#{roomid}:update", { room }
+      console.log ""
 
     # handle disconnects
     socket.on 'disconnect', ->
       if roomid && username
-        new RoomModel roomid, (roomState) ->
+        new RoomModel roomid, ->
           @disconnect { username }, updateEveryone
 
     # User wants to join with a username
     socket.on 'room:join', (data) ->
       { joiningRoomid, joiningUsername } = data
-      new RoomModel roomid, (roomState) ->
+      console.log "room:join with id:#{joiningRoomid} username:#{joiningUsername}"
+      new RoomModel joiningRoomid, ->
         roomid = joiningRoomid
         username = joiningUsername
         @addPlayer { username }, updateEveryone
 
     # Leave room
     socket.on 'room:unjoin', (data) ->
-      new RoomModel roomid, (roomState) ->
+      console.log "room:unjoin with id:#{roomid} username:#{username}"
+      new RoomModel roomid, ->
         @removePlayer { username }, (data) ->
+          socket.set 'roomid', 0
+          socket.set 'roomid', 0
           roomid = 0
           username = ''
           updateEveryone(data)
 
     # Start a game
     socket.on 'room:start', (data) ->
-      new RoomModel roomid, (roomState) ->
+      console.log "room:start with id:#{roomid} username:#{username}"
+      new RoomModel roomid, ->
         @startGame { username }, updateEveryone
 
     # Play a card
     socket.on 'room:card:play', (data) ->
       { card } = data
-      new RoomModel roomid, (roomState) ->
+      console.log "room:card:play with id:#{roomid} username:#{username} card:#{card}"
+      new RoomModel roomid, ->
         @playCard { username, card }, updateEveryone
 
     # Draw a card
     socket.on 'room:card:draw', (data) ->
-      new RoomModel roomid, (roomState) ->
+      console.log "room:card:draw with id:#{roomid} username:#{username}"
+      new RoomModel roomid, ->
         @drawCard { username }, updateEveryone
 
     # Skip a turn
     socket.on 'room:card:skip', (data) ->
-      new RoomModel roomid, (roomState) ->
+      console.log "room:card:skip with id:#{roomid} username:#{username}"
+      new RoomModel roomid, ->
         @skipTurn { username }, updateEveryone
 

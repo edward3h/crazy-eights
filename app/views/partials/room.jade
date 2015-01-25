@@ -1,57 +1,91 @@
 
-.loading(ng-show='loading')
-  .container
-    h1.title Loading
+.main-section.loading(ng-show='loading')
+  .title-pane
+    h1.title Crazy Eights
+  .loading-text.full-pane Loading...
 
-.login(ng-show='login',ng-hide='loading')
-  .container
+.main-section.login(ng-show='login && !loading')
+  .title-pane
+    h1.title Crazy Eights
+  .form.full-pane
     form(ng-submit='joinRoom()')
-        input(type='text',ng-model='username')
-        button.send(type='submit') join
+      h3.message Enter your name:
+      input.username(type='text',ng-model='username',maxlength='16')
+      button.send(type='submit') join
+
+.main-section.main-room(ng-show='!login && !loading')
+  .title-pane
+    h1.title Crazy Eights
+  .left-pane.player-list
+    h3.message Players
+    ul
+      li(ng-repeat='playerName in roomInfo.playerNames',
+        ng-class='{"current-user": $index == playerIndex, "current-player": roomInfo.gameState == "started" && $index == roomInfo.currentPlayer,"wants-to-start": roomInfo.gameState == "notstarted" && roomInfo.playerGameStarted[$index]}')
+        .fa.fa-arrow-right
+        .fa.fa-check
+        .fa.fa-star-o
+        | {{playerName}}
+
+  .right-pane
+
+    .section.notstarted(ng-show='roomInfo.gameState == "notstarted"')
+      .messages
+        h3.message Hello, {{username}}!
+        h3.message-small Click the button if you want to start the game.
+        h3.message-small It will only start when all players decide to start the game.
+        h3.message-small Every game must have a minimum of two players.
+        button.big-button(ng-click='startGame()') Start Game
+
+    .section.started(ng-show='roomInfo.gameState == "started"',ng-class='{"is-my-turn": isMyTurn}')
+      .mask
+      .game-table
+        .pile
+          img.card(ng-src="/images/cards/{{roomInfo.pile == '' ? 'empty' : roomInfo.pile}}.png")
+          h3.message Last Card Played
+        .deck
+          a(href='#',ng-click='drawCard()')
+            img.card(ng-src="/images/cards/back.png")
+          h3.message Deck
+      .hand
+        h3.message Your Hand
+        h3.message-small
+          span(ng-show='!isMyTurn') It is currently not your turn!
+          span(ng-show='invalidMove && isMyTurn') Invalid move!
+          span(ng-show='!invalidMove && isMyTurn') It is your turn.&nbsp;
+            a(href='#',ng-click='skipTurn()') (skip turn)
+        ul
+          li(ng-repeat='playerCard in myProperties.playerCards')
+            a(href='#',ng-click='playCard(playerCard)')
+              img.card(ng-src='/images/cards/{{playerCard}}.png')
 
 
-.chat-room(ng-hide='login || loading')
-  .container
 
-    h1.title Room #<span class='room'>{{roomInfo.room}}</span>
+.error(ng-show="error != ''")
 
 
 
 
+  //- .container
 
+  //-   .col-sm-12
+  //-     h1.title Welcome to Crazy Eights
 
+  //-   .col-sm-2.player-list
+  //-     p Players
+  //-     ul
+  //-       li(ng-repeat='playerName in roomInfo.playerNames',
+  //-         ng-class='{"current-player": $index == roomInfo.currentPlayer,"wants-to-start": roomInfo.playerGameStarted[$index]}') {{playerName}}
 
+  //-   .col-sm-10(ng-show='roomInfo.gameState == "notstarted"')
 
+  //-     p Game State: {{roomInfo.gameState}}
 
+  //-     p Your username: {{username}}
 
+  //-     p You are player number {{playerIndex + 1}}
 
+  //-     button(ng-click='startGame()') Start Game!
 
+  //-   .col-sm-10(ng-show='roomInfo.gameState == "started"')
 
-
-
-
-
-    //- ul.messages
-    //-   li.title-bar
-    //-     .user User
-    //-     .message Message
-    //-     .clearfix
-
-    //-   li.message(ng-repeat="message in messages")
-    //-     .user {{message.user}}
-    //-     .message {{message.message}}
-    //-     .clearfix
-
-    //-   li.new-message
-
-    //-     form(ng-submit="sendMessage()")
-
-    //-       .user
-    //-         input(type='text',name='user',ng-model='currentUser')
-
-    //-       .message
-    //-         input(type='text',name='message',ng-model='currentMessage')
-
-    //-       button.send(type='submit') send
-
-    //-       .clearfix
+  //-     p THE GAME HAS BEGUN!

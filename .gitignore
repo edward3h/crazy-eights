@@ -28,3 +28,7 @@ benchmarks/graphs
 
 # Bower
 app/assets/vendor
+
+# PSD
+*.psd
+
