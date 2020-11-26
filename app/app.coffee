@@ -12,7 +12,8 @@ exports.app = app = express()
 if process.env.REDISCLOUD_URL
   redisCloud = url.parse(process.env.REDISCLOUD_URL)
   app.client = client = redis.createClient(redisCloud.port, redisCloud.hostname)
-  client.auth(redisCloud.auth.split(':')[1])
+  if redisCloud.auth
+    client.auth(redisCloud.auth.split(':')[1])
 else
   app.client = client = redis.createClient()
 
