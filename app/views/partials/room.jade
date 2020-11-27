@@ -1,12 +1,12 @@
 
 .main-section.loading(ng-show='loading')
   .title-pane
-    h1.title Crazy Eights
+    h1.title NUO
   .loading-text.full-pane Loading...
 
 .main-section.login(ng-show='login && !loading')
   .title-pane
-    h1.title Crazy Eights
+    h1.title NUO
   .form.full-pane
     form(ng-submit='joinRoom()')
       h3.message Enter your name:
@@ -15,7 +15,7 @@
 
 .main-section.main-room(ng-show='!login && !loading')
   .title-pane
-    h1.title Crazy Eights
+    h1.title NUO
   .left-pane.player-list
     h3.message(ng-hide='roomInfo.playerCount == 0') Players
     h3.message(ng-show='roomInfo.playerCount == 0') No Players!
@@ -42,6 +42,7 @@
       .game-table
         .pile
           img.card(ng-src="/images/cards/{{roomInfo.pile == '' ? 'empty' : roomInfo.pile}}.png")
+          span.color(ng-show='roomInfo.wildColor') {{roomInfo.wildColor}}
           h3.message Last Card Played
         .deck
           a(href='#',ng-click='drawCard()')
@@ -53,12 +54,15 @@
           span(ng-show='!isMyTurn') It is currently not your turn!
           span(ng-show='invalidMove && isMyTurn') Invalid move!
           span(ng-show='!invalidMove && isMyTurn') It is your turn.&nbsp;
-            a(href='#',ng-click='skipTurn()') (skip turn)
+            //- a(href='#',ng-click='skipTurn()') (skip turn)
         ul
-          li(ng-repeat='playerCard in myProperties.playerCards')
+          li(ng-repeat='playerCard in myProperties.playerCards track by $index')
             a(href='#',ng-click='playCard(playerCard)')
               img.card(ng-src='/images/cards/{{playerCard}}.png')
-
+    .overlay.chooseColor(ng-show='isMyTurn && roomInfo.playState == "chooseColor"')
+      ul
+        li(ng-repeat='color in colors')
+          a(href='#',ng-click='chooseColor(color)') {{color}}
     .overlay.error(ng-show='error != ""')
       .contents
         a.close.fa.fa-close(href='#',ng-click='error = ""',ng-hide='fatal')

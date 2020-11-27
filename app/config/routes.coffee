@@ -79,6 +79,13 @@ module.exports = (app) ->
       new RoomModel roomid, ->
         @playCard { username, card }, updateEveryone
 
+    # Choose Wild card color
+    socket.on 'room:card:chooseColor', (data) ->
+      { color } = data
+      console.log "room:card:chooseColor with id:#{roomid} username:#{username} color:#{color}"
+      new RoomModel roomid, ->
+        @chooseColor { username, color }, updateEveryone
+
     # Draw a card
     socket.on 'room:card:draw', (data) ->
       console.log "room:card:draw with id:#{roomid} username:#{username}"

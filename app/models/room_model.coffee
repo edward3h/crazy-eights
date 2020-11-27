@@ -6,6 +6,8 @@ module.exports = (app) ->
 
   class RoomModel
 
+    COLORS: ['red', 'green', 'blue', 'yellow']
+
     constructor: (@id, callback) ->
       # Reset all values
       @playerCards = []
@@ -14,9 +16,10 @@ module.exports = (app) ->
       @playerGameWon = []
       @playerCount = 0
       @currentPlayer = -1
+      @direction = 1
       @deck = new CardSetModel()
       @pile = new CardSetModel()
-
+      
       @gameState = 'notstarted'
       # States:
       # notstarted - Game has not started
@@ -27,7 +30,7 @@ module.exports = (app) ->
       @exists (roomExists) =>
         if roomExists
           app.client.hgetall "room:#{@id}", (err, room) =>
-            { @gameState, deck, pile } = room
+            { @gameState, deck, pile, @direction, @playState, @wildColor } = room
             @currentPlayer = parseInt(room.currentPlayer, 10)
             @playerCount = parseInt(room.playerCount, 10)
             @deck = new CardSetModel(deck)
@@ -119,7 +122,7 @@ module.exports = (app) ->
                 @gameState = 'started'
                 @deck.getShuffledDeck()
                 for playerCard in @playerCards
-                  for n in [1..8]
+                  for n in [1..7]
                     playerCard.addCard @deck.popCard()
                 @nextPlayer()
 
@@ -146,8 +149,9 @@ module.exports = (app) ->
               if playerIndex == @currentPlayer
                 if @playerCards[playerIndex].hasCard(card)
                   if @playerGameWon[playerIndex] == 0
-                    if @pile.possibleNextMove(card)
+                    if @pile.possibleNextMove(card, @wildColor)
                       @pile.addCard @playerCards[playerIndex].removeCard(card)
+                      @wildColor = ''
 
                       unless @playerCards[playerIndex].isActive()
                         @playerGameWon[playerIndex] = _.max(@playerGameWon) + 1
@@ -155,6 +159,11 @@ module.exports = (app) ->
                       if _.select(@playerGameWon, ( (i) -> i )).length == 1
                         @gameState = 'ended'
                         app.client.del "room:#{@id}", (err, data) =>
+                          callback.call(@, error: false, room: @roomState())
+
+                      else if card.charAt(0) == 'x' # wild card
+                        @playState = 'chooseColor'
+                        app.client.hmset "room:#{@id}", @roomHash(), (err, data) =>
                           callback.call(@, error: false, room: @roomState())
 
                       else
@@ -170,6 +179,46 @@ module.exports = (app) ->
 
                 # Player does not have the card
                 else callback.call(@, error: true, code: 44)
+
+              # Player isn't playing right now
+              else callback.call(@, error: true, code: 43)
+
+            # Player doesn't exist
+            else callback.call(@, error: true, code: 42)
+
+          # Game is not in progress
+          else callback.call(@, error: true, code: 41)
+
+        # We're loading a room that doesn't exist
+        else callback.call(@, error: true, code: 40)
+
+    chooseColor: (data, callback) ->
+      { username, color } = data
+      @exists (roomExists) =>
+        if roomExists
+          if @gameState == 'started'
+            playerIndex = @getPlayerIndex(username)
+            unless playerIndex == -1
+              if playerIndex == @currentPlayer
+                console.log('chooseColor', data, @)
+                if @playState == 'chooseColor'
+                  if @playerGameWon[playerIndex] == 0
+                    if @validColor(color)
+                      @playState = ''
+                      @wildColor = color
+                      
+                      @nextPlayer()
+                      app.client.hmset "room:#{@id}", @roomHash(), (err, data) =>
+                        callback.call(@, error: false, room: @roomState())
+
+                    # Invalid move!
+                    else callback.call(@, error: true, code: 46)
+
+                  # Player has already won
+                  else callback.call(@, error: true, code: 45)
+
+                # not waiting for color
+                else callback.call(@, error: true, code: 81)
 
               # Player isn't playing right now
               else callback.call(@, error: true, code: 43)
@@ -264,7 +313,7 @@ module.exports = (app) ->
 
     roomHash: ->
       hash = {
-        @playerCount, @currentPlayer, @gameState
+        @playerCount, @currentPlayer, @gameState, @playState, @direction, @wildColor
         deck: @deck.getSet(), pile: @pile.getSet()
       }
       for index in [0...@playerCount]
@@ -278,7 +327,7 @@ module.exports = (app) ->
     roomState: ->
       state = {
         room: @id
-        @playerCount, @currentPlayer, @gameState
+        @playerCount, @currentPlayer, @gameState, @playState, @direction, @wildColor
         pile: @pile.topCard()
         @playerNames, @playerGameStarted, @playerGameWon
         playerCards: []
@@ -313,3 +362,7 @@ module.exports = (app) ->
 
     getPlayerIndex: (username) ->
       @playerNames.indexOf username
+
+    validColor: (color) ->
+      console.log("validColor", color, @COLORS)
+      _.contains(@COLORS, color)

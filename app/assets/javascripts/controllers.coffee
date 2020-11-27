@@ -15,6 +15,7 @@ angular.module 'crazy-eights.controllers', []
       loading: true
       login: false
       error: ''
+      colors: ['red', 'green', 'blue', 'yellow']
 
     ($scope.loadRoom = ->
       $scope.loading = true
@@ -45,6 +46,11 @@ angular.module 'crazy-eights.controllers', []
       return unless $scope.playerIndex == $scope.roomInfo.currentPlayer
       $socket.emit 'room:card:play', { card }
 
+    $scope.chooseColor = (color) ->
+      return if $scope.login
+      return unless $scope.playerIndex == $scope.roomInfo.currentPlayer
+      $socket.emit 'room:card:chooseColor', { color }
+
     $scope.drawCard = ->
       return if $scope.login
       return unless $scope.playerIndex == $scope.roomInfo.currentPlayer
@@ -63,10 +69,10 @@ angular.module 'crazy-eights.controllers', []
           $scope.invalidMove = true
           $timeout ( -> $scope.invalidMove = false ), 2000
         when 10, 20, 30, 40, 50, 60, 70
-          $scope.error = 'doesnt exist lol'
+          $scope.error = 'doesnt exist'
           $scope.fatal = true
         else
-          $scope.error = 'some unknown error lol'
+          $scope.error = 'some unknown error'
 
     loadRoomData = (data) ->
       { room } = data

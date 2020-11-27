@@ -4,8 +4,9 @@ _s = require 'underscore.string'
 module.exports = (app) ->
   class CardSetModel
 
-    POSSIBLE_SUITS: 'scdh'.split('')
-    POSSIBLE_NUMBERS: 'a234567890jqk'.split('')
+    POSSIBLE_SUITS: 'rgby'.split('')
+    POSSIBLE_NUMBERS: '0123456789srd'.split('')
+    WILD: ['xw', 'x4']
 
     constructor: (@set = '') ->
       @
@@ -40,14 +41,22 @@ module.exports = (app) ->
       for suit in @POSSIBLE_SUITS
         for number in @POSSIBLE_NUMBERS
           deck.push "#{suit}#{number}"
+          if number != "0"
+            deck.push "#{suit}#{number}" # two each of these
+      for card in @WILD
+        for n in [1..4]
+          deck.push card # four each of these
       @set = _.shuffle(deck).join ''
 
     validateCard: (card) ->
-      _.contains(@POSSIBLE_SUITS, card.charAt(0)) &&
-      _.contains(@POSSIBLE_NUMBERS, card.charAt(1))
+      _.contains(@WILD, card) || 
+      (_.contains(@POSSIBLE_SUITS, card.charAt(0)) &&
+      _.contains(@POSSIBLE_NUMBERS, card.charAt(1)))
 
-    possibleNextMove: (card) ->
+    possibleNextMove: (card, color) ->
       @validateCard(card) &&
       (@set == '' ||
       card.charAt(0) == @topCard().charAt(0) ||
-      card.charAt(1) == @topCard().charAt(1))
+      card.charAt(1) == @topCard().charAt(1) ||
+      _.contains(@WILD, card)) || # TODO restriction on playing +4 
+      (_.contains(@WILD, @topCard()) && color && card.charAt(0) == color.charAt(0))
