@@ -26,6 +26,10 @@
         .fa.fa-check
         .fa.fa-star-o
         | {{playerName}}
+    h3.message(ng-hide='roomInfo.playerCount < 3') Direction of play
+    .direction(ng-hide='roomInfo.playerCount < 3', ng-class='{"direction-up": direction < 0, "direction-down": direction > 0}')
+      .fa.fa-arrow-up
+      .fa.fa-arrow-down
 
   .right-pane
 
@@ -60,9 +64,10 @@
             a(href='#',ng-click='playCard(playerCard)')
               img.card(ng-src='/images/cards/{{playerCard}}.png')
     .overlay.chooseColor(ng-show='isMyTurn && roomInfo.playState == "chooseColor"')
-      ul
-        li(ng-repeat='color in colors')
-          a(href='#',ng-click='chooseColor(color)') {{color}}
+      .contents
+        ul
+          li(ng-repeat='color in colors')
+            a(href='#',ng-click='chooseColor(color)') {{color}}
     .overlay.error(ng-show='error != ""')
       .contents
         a.close.fa.fa-close(href='#',ng-click='error = ""',ng-hide='fatal')
@@ -72,6 +77,9 @@
       .contents
         a.close.fa.fa-close(href='#',ng-click='error = ""',ng-hide='fatal')
         .message We have a winner!
+    .overlay.alert(ng-show='alert')
+      .contents(ng-click='alert = ""')
+        h3 {{alert}}
 
 
 

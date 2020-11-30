@@ -34,3 +34,4 @@ app/assets/vendor
 
 app/public/images/cards/*
 !app/public/images/cards/empty.png
+*.js

@@ -53,10 +53,12 @@ module.exports = (app) ->
       (_.contains(@POSSIBLE_SUITS, card.charAt(0)) &&
       _.contains(@POSSIBLE_NUMBERS, card.charAt(1)))
 
-    possibleNextMove: (card, color) ->
+    possibleNextMove: (card, color, playerCards) ->
+      pileCard = @topCard()
       @validateCard(card) &&
       (@set == '' ||
-      card.charAt(0) == @topCard().charAt(0) ||
-      card.charAt(1) == @topCard().charAt(1) ||
-      _.contains(@WILD, card)) || # TODO restriction on playing +4 
-      (_.contains(@WILD, @topCard()) && color && card.charAt(0) == color.charAt(0))
+      card.charAt(0) == pileCard.charAt(0) ||
+      card.charAt(1) == pileCard.charAt(1) ||
+      card == 'xw' ||
+      (card == 'x4' && !_.some(playerCards, (c) -> c.charAt(0) == pileCard.charAt(0))) ||
+      (_.contains(@WILD, pileCard) && color && card.charAt(0) == color.charAt(0)))

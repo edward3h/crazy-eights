@@ -80,7 +80,9 @@ angular.module 'crazy-eights.controllers', []
       $scope.playerIndex = room.playerNames.indexOf($scope.username)
 
       $scope.isMyTurn = (room.currentPlayer == $scope.playerIndex)
-
+      $scope.alert = room.alert
+      if alert
+        $timeout ( -> $scope.alert = '' ), 2000
       $scope.myProperties =
         playerCards: _.str.chop(room.playerCards[$scope.playerIndex], 2)
         playerName: room.playerNames[$scope.playerIndex]
@@ -88,6 +90,7 @@ angular.module 'crazy-eights.controllers', []
         playerWon: room.playerGameWon[$scope.playerIndex]
 
       $scope.roomInfo = room
+      $scope.direction = room.direction
 
 ]
 

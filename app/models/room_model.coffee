@@ -17,6 +17,8 @@ module.exports = (app) ->
       @playerCount = 0
       @currentPlayer = -1
       @direction = 1
+      @playState = ''
+      @wildColor = ''
       @deck = new CardSetModel()
       @pile = new CardSetModel()
       
@@ -30,9 +32,10 @@ module.exports = (app) ->
       @exists (roomExists) =>
         if roomExists
           app.client.hgetall "room:#{@id}", (err, room) =>
-            { @gameState, deck, pile, @direction, @playState, @wildColor } = room
+            { @gameState, deck, pile, @playState, @wildColor } = room
             @currentPlayer = parseInt(room.currentPlayer, 10)
             @playerCount = parseInt(room.playerCount, 10)
+            @direction = parseInt(room.direction, 10)
             @deck = new CardSetModel(deck)
             @pile = new CardSetModel(pile)
             for index in [0...@playerCount]
@@ -149,7 +152,7 @@ module.exports = (app) ->
               if playerIndex == @currentPlayer
                 if @playerCards[playerIndex].hasCard(card)
                   if @playerGameWon[playerIndex] == 0
-                    if @pile.possibleNextMove(card, @wildColor)
+                    if @pile.possibleNextMove(card, @wildColor, @playerCards[playerIndex])
                       @pile.addCard @playerCards[playerIndex].removeCard(card)
                       @wildColor = ''
 
@@ -161,13 +164,26 @@ module.exports = (app) ->
                         app.client.del "room:#{@id}", (err, data) =>
                           callback.call(@, error: false, room: @roomState())
 
-                      else if card.charAt(0) == 'x' # wild card
-                        @playState = 'chooseColor'
-                        app.client.hmset "room:#{@id}", @roomHash(), (err, data) =>
-                          callback.call(@, error: false, room: @roomState())
-
                       else
-                        @nextPlayer()
+                        if card.charAt(0) == 'x' # wild card
+                          @playState = 'chooseColor'
+                        else if card.charAt(1) == 'r' && @playerCount > 2 # reverse
+                          @direction *= -1
+                          @alert = "Reversed direction"
+                          @nextPlayer()
+                        else if card.charAt(1) == 's' || (card.charAt(1) == 'r' && @playerCount == 2) # skip
+                          @nextPlayer()
+                          @alert = "Skipped player #{@playerNames[@currentPlayer]}"
+                          @nextPlayer()
+                        else if card.charAt(1) == 'd' # draw 2
+                          @nextPlayer()
+                          @alert = "Player #{@playerNames[@currentPlayer]} had to draw 2"
+                          for n in [1..2]
+                            topCard = @deck.topCard()
+                            @playerCards[@currentPlayer].addCard @deck.removeCard(topCard)
+                          @nextPlayer()
+                        else
+                          @nextPlayer()
                         app.client.hmset "room:#{@id}", @roomHash(), (err, data) =>
                           callback.call(@, error: false, room: @roomState())
 
@@ -206,7 +222,13 @@ module.exports = (app) ->
                     if @validColor(color)
                       @playState = ''
                       @wildColor = color
-                      
+                      card = @pile.topCard()
+                      if card.charAt(1) == '4' # draw 4
+                        @nextPlayer()
+                        @alert = "Player #{@playerNames[@currentPlayer]} had to draw 4"
+                        for n in [1..4]
+                          topCard = @deck.topCard()
+                          @playerCards[@currentPlayer].addCard @deck.removeCard(topCard)                      
                       @nextPlayer()
                       app.client.hmset "room:#{@id}", @roomHash(), (err, data) =>
                         callback.call(@, error: false, room: @roomState())
@@ -243,6 +265,9 @@ module.exports = (app) ->
 
                 topCard = @deck.topCard()
                 @playerCards[playerIndex].addCard @deck.removeCard(topCard)
+                if @pile.possibleNextMove(topCard, @wildColor, @playerCards[playerIndex])
+                  @playCard({ username, card: topCard}, callback)
+                  return
 
                 @nextPlayer()
 
@@ -327,7 +352,7 @@ module.exports = (app) ->
     roomState: ->
       state = {
         room: @id
-        @playerCount, @currentPlayer, @gameState, @playState, @direction, @wildColor
+        @playerCount, @currentPlayer, @gameState, @playState, @direction, @wildColor, @alert
         pile: @pile.topCard()
         @playerNames, @playerGameStarted, @playerGameWon
         playerCards: []
@@ -354,7 +379,7 @@ module.exports = (app) ->
         else @createRoom(callback)
 
     nextPlayer: ->
-      @currentPlayer = (parseInt(@currentPlayer, 10) + 1) % @playerCount
+      @currentPlayer = (parseInt(@currentPlayer, 10) + @direction + @playerCount) % @playerCount
       if (@playerCards[@currentPlayer].isActive())
         @currentPlayer
       else
