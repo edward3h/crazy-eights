@@ -32,6 +32,5 @@ app/assets/vendor
 # PSD
 *.psd
 
-app/public/images/cards/*
 !app/public/images/cards/empty.png
 *.js

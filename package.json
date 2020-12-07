@@ -19,7 +19,7 @@
   "devDependencies": {},
   "scripts": {
     "start": "node server.js",
-    "build": "./node_modules/bower/bin/bower install && ./script/generate_images.sh"
+    "build": "./node_modules/bower/bin/bower install"
   },
   "engines": {
     "node": "15.3.0",
