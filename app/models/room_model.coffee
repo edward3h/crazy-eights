@@ -138,7 +138,7 @@ module.exports = (app) ->
                 for n in [1..7]
                   playerCard.addCard @deck.popCard()
               @pile.addCard @deck.popCard()
-              while @pile.topCard.charAt(0) == 'x'
+              while @pile.topCard().charAt(0) == 'x'
                 @pile.addCard @deck.popCard()
 
               for n in [1.._.random(@playerCount)]
@@ -276,8 +276,8 @@ module.exports = (app) ->
             unless playerIndex == -1
               if playerIndex == @currentPlayer
 
-                topCard = @deck.topCard()
-                @playerCards[playerIndex].addCard @deck.removeCard(topCard)
+                topCard = @deck.popCard()
+                @playerCards[playerIndex].addCard topCard
                 if @pile.possibleNextMove(topCard, @wildColor, @playerCards[playerIndex])
                   @playCard({ username, card: topCard}, callback)
                   return

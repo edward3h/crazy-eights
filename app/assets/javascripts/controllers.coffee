@@ -95,6 +95,8 @@ angular.module 'crazy-eights.controllers', []
         playerStarted: room.playerGameStarted[$scope.playerIndex]
         playerWon: room.playerGameWon[$scope.playerIndex]
 
+      if $scope.myProperties.playerCards
+        $scope.myProperties.playerCards.sort()
       $scope.roomInfo = room
       $scope.direction = room.direction
       $scope.winner = if room.gameState == 'ended'

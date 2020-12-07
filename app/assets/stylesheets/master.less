@@ -29,8 +29,8 @@ html {
 body {
   font-family: "Neuton", sans-serif;
   // height: 100%;
-  overflow: visible;
-  -webkit-overflow-scrolling: touch;
+  // overflow: visible;
+  // -webkit-overflow-scrolling: touch;
 
   // background-image: url('/images/wood.jpg');
   // background-size: cover;
@@ -118,7 +118,8 @@ button.big-button {
 
   .container {
     display: flex;
-    @media screen and (max-width: 480px) {
+    flex-direction: row;
+    @media (orientation: portrait) {
       flex-direction: column;
     }
   }
@@ -230,6 +231,11 @@ button.big-button {
     text-align: right;
     padding: 1rem 2rem;
     border-right: medium groove;
+    @media (orientation: portrait) {
+      border-right: none;
+      border-bottom: medium groove;
+      text-align: center;
+    }
     .message {
       padding-bottom: 1rem;
       padding-right: 1rem;
@@ -238,8 +244,9 @@ button.big-button {
       font-size: 1.5rem;
       display: flex;
       flex-direction: column;
-      @media screen and (max-width: 480px) {
+      @media (orientation: portrait) {
         flex-direction: row;
+        justify-content: center;
       }
       li {
         padding: 1rem 1.5rem;
@@ -337,7 +344,7 @@ button.big-button {
         flex-grow: 1;
       }
       .pile {
-        flex-grow: 2;
+        flex-grow: 1;
         position: relative;
         span.color {
           display: inline-block;
@@ -379,7 +386,7 @@ button.big-button {
 
     .hand {
       flex-grow: 1;
-      overflow: scroll;
+      overflow: auto;
       border-top: medium groove;
       position: relative;
       .message {

@@ -71,5 +71,5 @@ module.exports = (app) ->
       card.charAt(0) == pileCard.charAt(0) ||
       card.charAt(1) == pileCard.charAt(1) ||
       card == 'xw' ||
-      (card == 'x4' && !_.some(playerCards, (c) -> c.charAt(0) == pileCard.charAt(0))) ||
+      (card == 'x4' && !_.some(_s.chop(playerCards.getSet(), 2), (c) -> c.charAt(0) == pileCard.charAt(0))) ||
       (_.contains(@WILD, pileCard) && color && card.charAt(0) == color.charAt(0)))
