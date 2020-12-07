@@ -11,6 +11,7 @@ services:
      - /code/node_modules
     environment:
       - REDISCLOUD_URL=http://redis:6379
+      # - NODE_ENV=production
     depends_on:
      - redis
   redis:
