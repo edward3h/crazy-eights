@@ -7,7 +7,7 @@ EMPTY="$CARD_DIR/empty.png"
 FONT="$PROJECT_PATH/script/JetBrainsMono-Bold.ttf"
 SYMBOLFONT="$PROJECT_PATH/app/assets/vendor/font-awesome/fonts/fontawesome-webfont.ttf"
 
-magick convert "$EMPTY" -fill black \
+convert "$EMPTY" -fill black \
   -draw "roundrectangle 10,10 245,370 10,10" \
   -fill red \
   -stroke white \
@@ -25,7 +25,7 @@ magick convert "$EMPTY" -fill black \
 for color in red blue green yellow; do
     c=${color:0:1}
     for number in $(seq 0 9); do
-        magick convert "$EMPTY" -fill $color \
+        convert "$EMPTY" -fill $color \
             -draw "roundrectangle 10,10 245,370 10,10" \
             -fill white \
             -stroke white \
@@ -40,7 +40,7 @@ for color in red blue green yellow; do
             -draw "text 0,0 '$number'" \
             "$CARD_DIR/${c}$number.png"
     done
-            magick convert "$EMPTY" -fill $color \
+            convert "$EMPTY" -fill $color \
             -draw "roundrectangle 10,10 245,370 10,10" \
             -fill white \
             -stroke white \
@@ -55,7 +55,7 @@ for color in red blue green yellow; do
             -draw "text 0,0 ''" \
             "$CARD_DIR/${c}s.png"
             
-                        magick convert "$EMPTY" -fill $color \
+                        convert "$EMPTY" -fill $color \
             -draw "roundrectangle 10,10 245,370 10,10" \
             -fill white \
             -stroke white \
@@ -70,7 +70,7 @@ for color in red blue green yellow; do
             -draw "text 0,0 ''" \
             "$CARD_DIR/${c}r.png"
 
-                                    magick convert "$EMPTY" -fill $color \
+                                    convert "$EMPTY" -fill $color \
             -draw "roundrectangle 10,10 245,370 10,10" \
             -fill white \
             -stroke white \
@@ -85,7 +85,7 @@ for color in red blue green yellow; do
             -draw "text 0,0 '+2'" \
             "$CARD_DIR/${c}d.png"
 
-    magick convert "$EMPTY" -fill black \
+    convert "$EMPTY" -fill black \
   -draw "roundrectangle 10,10 245,370 10,10" \
   -stroke white \
   -strokewidth 12 \
@@ -106,7 +106,7 @@ for color in red blue green yellow; do
   -draw "text 0,0 Wild" \
   "$CARD_DIR/xw.png"
 
-      magick convert "$EMPTY" -fill black \
+      convert "$EMPTY" -fill black \
   -draw "roundrectangle 10,10 245,370 10,10" \
   -stroke white \
   -strokewidth 12 \
