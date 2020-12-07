@@ -8,9 +8,10 @@ module.exports = (app) ->
     POSSIBLE_NUMBERS: '0123456789srd'.split('')
     WILD: ['xw', 'x4']
 
-    constructor: (@set = '') ->
+    constructor: (@set = '', @onEmpty = (csm) -> ) ->
       @
 
+    clear: -> @set = ''
     getSet: -> @set
     isActive: -> @set != ''
 
@@ -18,10 +19,20 @@ module.exports = (app) ->
       @set += card if @validateCard(card)
 
     removeCard: (card) ->
-      @set = _.without(_s.chop(@set, 2), card).join '' if @validateCard(card)
+      if @validateCard(card)
+        array = _s.chop(@set, 2) || []
+        index = array.lastIndexOf(card)
+        console.log("removeCard", card, @set, array, index)
+        if index > -1
+          array.splice(index, 1)
+          @set = array.join '' 
       card
 
     popCard: ->
+      if @set == ''
+        @onEmpty(@)
+      if @set == ''
+        return
       card = @set.substr(-2)
       @set = @set.substr(0, @set.length - 2)
       card

@@ -60,8 +60,6 @@ module.exports = (app) ->
       console.log "room:unjoin with id:#{roomid} username:#{username}"
       new RoomModel roomid, ->
         @removePlayer { username }, (data) ->
-          socket.set 'roomid', 0
-          socket.set 'roomid', 0
           roomid = 0
           username = ''
           updateEveryone(data)
@@ -98,3 +96,16 @@ module.exports = (app) ->
       new RoomModel roomid, ->
         @skipTurn { username }, updateEveryone
 
+    # play again or end
+    socket.on 'room:playAgain', (data) ->
+      { b } = data
+      console.log "room:playAgain with id:#{roomid} username:#{username} value:#{b}"
+      new RoomModel roomid, ->
+        if b 
+          @startGame { username }, updateEveryone
+        else
+          @removePlayer { username }, (data) ->
+            roomid = 0
+            username = ''
+            updateEveryone(data)
+         

@@ -11,7 +11,7 @@ angular.module 'crazy-eights.controllers', []
     # Initial scope
     _.extend $scope,
       messages: []
-      room: parseInt($routeParams.room, 10)
+      room: $routeParams.room.toLowerCase()
       loading: true
       login: false
       error: ''
@@ -61,6 +61,12 @@ angular.module 'crazy-eights.controllers', []
       return unless $scope.playerIndex == $scope.roomInfo.currentPlayer
       $socket.emit 'room:card:skip'
 
+    $scope.playAgain = (b) ->
+      return if $scope.login
+      $socket.emit 'room:playAgain', { b }
+      unless b
+        $timeout ( -> window.location.href = '/'), 100
+
     loadError = (data) ->
       { code } = data
       console.log 'received ERROR', code
@@ -91,6 +97,8 @@ angular.module 'crazy-eights.controllers', []
 
       $scope.roomInfo = room
       $scope.direction = room.direction
+      $scope.winner = if room.gameState == 'ended'
+        room.playerNames[room.playerGameWon.indexOf(1)]
 
 ]
 

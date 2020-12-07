@@ -34,7 +34,7 @@ app.configure ->
   app.use autoprefixer
     browsers: 'last 5 versions'
     cascade: false
-  app.use connect(src: "#{__dirname}/assets")
+  app.use connect(src: "#{__dirname}/assets", fingerprinting: true)
 
   app.use express.static("#{__dirname}/public")
   app.use app.router
