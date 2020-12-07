@@ -1,6 +1,8 @@
 #!/bin/bash
 
-PROJECT_PATH=$(git rev-parse --show-toplevel)
+if [[ -z "$PROJECT_PATH" ]]; then
+  PROJECT_PATH=$(git rev-parse --show-toplevel)
+fi
 
 CARD_DIR="$PROJECT_PATH/app/public/images/cards"
 EMPTY="$CARD_DIR/empty.png"
