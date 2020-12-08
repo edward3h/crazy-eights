@@ -8,7 +8,7 @@ services:
      - "3000:3000"
     volumes:
      - .:/code
-     - /code/node_modules
+    #  - /code/node_modules
     environment:
       - REDISCLOUD_URL=http://redis:6379
       # - NODE_ENV=production
