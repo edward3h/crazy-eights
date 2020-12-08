@@ -45,6 +45,7 @@ app.use autoprefixer
 app.use connect(src: "#{__dirname}/assets", fingerprinting: true)
 
 app.use express.static("#{__dirname}/public")
+app.use '/assets/webfonts', express.static("#{__dirname}/assets/vendor/components-font-awesome/webfonts")
 # app.use app.router
 
 # development only
