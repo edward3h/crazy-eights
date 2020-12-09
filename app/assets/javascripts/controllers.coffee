@@ -90,7 +90,7 @@ angular.module 'crazy-eights.controllers', []
       if alert
         $timeout ( -> $scope.alert = '' ), 2000
       $scope.myProperties =
-        playerCards: _.str.chop(room.playerCards[$scope.playerIndex], 2)
+        playerCards: s.chop(room.playerCards[$scope.playerIndex], 2)
         playerName: room.playerNames[$scope.playerIndex]
         playerStarted: room.playerGameStarted[$scope.playerIndex]
         playerWon: room.playerGameWon[$scope.playerIndex]

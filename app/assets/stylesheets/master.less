@@ -1,16 +1,18 @@
-//= require vendor/font-awesome/css/font-awesome.min.css
+@import "../vendor/components-font-awesome/less/fontawesome.less";
+@import "../vendor/components-font-awesome/less/solid.less";
 
 // Font Import
-@import url("//fonts.googleapis.com/css?family=Neuton:400,700|Bree+Serif");
+// @import url("https://fonts.googleapis.com/css?family=Neuton:400,700|Bree+Serif");
+@import "vendor/gfonts.less";
 
 // Override Font Awesome fonts
-@font-face {
-  font-family: 'FontAwesome';
-  src: url('//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/fonts/fontawesome-webfont.eot');
-  src: url('//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/fonts/fontawesome-webfont.eot') format('embedded-opentype'), url('//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/fonts/fontawesome-webfont.woff') format('woff'), url('//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/fonts/fontawesome-webfont.ttf') format('truetype'), url('//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/fonts/fontawesome-webfont.svg') format('svg');
-  font-weight: normal;
-  font-style: normal;
-}
+// @font-face {
+//   font-family: 'FontAwesome';
+//   src: url('//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/fonts/fontawesome-webfont.eot');
+//   src: url('//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/fonts/fontawesome-webfont.eot') format('embedded-opentype'), url('//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/fonts/fontawesome-webfont.woff') format('woff'), url('//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/fonts/fontawesome-webfont.ttf') format('truetype'), url('//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/fonts/fontawesome-webfont.svg') format('svg');
+//   font-weight: normal;
+//   font-style: normal;
+// }
 
 ul, ol {
   margin: 0;
@@ -262,7 +264,7 @@ button.big-button {
           // left: 1rem;
         }
         &.current-user {
-          .fa-star-o { display: inline-block; }
+          .fa-star { display: inline-block; }
           &.current-player .fa-arrow-right, &.wants-to-start .fa-check {
             left: 3.5rem;
           }
@@ -273,7 +275,7 @@ button.big-button {
           .fa-arrow-right { display: inline-block; }
           &.current-user {
             background-color: #FA6666;
-            .fa-star-o { display: inline-block; }
+            .fa-star { display: inline-block; }
           }
         }
         &.wants-to-start {

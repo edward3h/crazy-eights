@@ -25,7 +25,7 @@
           ng-class='{"current-user": $index == playerIndex, "current-player": roomInfo.gameState == "started" && $index == roomInfo.currentPlayer,"wants-to-start": roomInfo.gameState == "notstarted" && roomInfo.playerGameStarted[$index]}')
           .fa.fa-arrow-right
           .fa.fa-check
-          .fa.fa-star-o
+          .fa.fa-star
           | {{playerName}} [{{roomInfo.playerCards[$index].length / 2}}]
       h3.message(ng-hide='roomInfo.playerCount < 3') Direction of play
       .direction(ng-hide='roomInfo.playerCount < 3', ng-class='{"direction-up": direction < 0, "direction-down": direction > 0}')
