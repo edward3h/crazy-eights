@@ -7,7 +7,7 @@ fi
 CARD_DIR="$PROJECT_PATH/app/public/images/cards"
 EMPTY="$CARD_DIR/empty.png"
 FONT="$PROJECT_PATH/script/JetBrainsMono-Bold.ttf"
-SYMBOLFONT="$PROJECT_PATH/app/assets/vendor/font-awesome/fonts/fontawesome-webfont.ttf"
+SYMBOLFONT="$PROJECT_PATH/app/assets/vendor/components-font-awesome/webfonts/fa-solid-900.ttf"
 
 convert "$EMPTY" -fill black \
   -draw "roundrectangle 10,10 245,370 10,10" \
@@ -23,6 +23,22 @@ convert "$EMPTY" -fill black \
   -pointsize 100 \
   -draw "rotate -20 text 0,0 NUO" \
   "$CARD_DIR/back.png"
+
+convert "$EMPTY" -fill black \
+  -draw "roundrectangle 25,25 230,355 25,25" \
+  -fill red \
+  -stroke white \
+  -strokewidth 30 \
+  -draw "translate 127,190 skewX -20 ellipse 0,0 105,140 0,360" \
+  -fill white \
+  -stroke black \
+  -strokewidth 5 \
+  -gravity Center \
+  -font "$FONT" \
+  -pointsize 100 \
+  -draw "rotate -20 text 0,0 NUO" \
+  -resize '25x38' \
+  "$CARD_DIR/mini.png"
 
 for color in red blue green yellow; do
     c=${color:0:1}

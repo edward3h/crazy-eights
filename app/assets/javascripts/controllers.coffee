@@ -82,7 +82,7 @@ angular.module 'crazy-eights.controllers', []
 
     loadRoomData = (data) ->
       { room } = data
-      console.log "received update", room
+      # console.log "received update", room
       $scope.playerIndex = room.playerNames.indexOf($scope.username)
 
       $scope.isMyTurn = (room.currentPlayer == $scope.playerIndex)
@@ -95,6 +95,10 @@ angular.module 'crazy-eights.controllers', []
         playerStarted: room.playerGameStarted[$scope.playerIndex]
         playerWon: room.playerGameWon[$scope.playerIndex]
 
+      $scope.players = room.playerNames.map (name, i) ->
+        count = room.playerCards[i].length / 2
+        cards = new Array(count).fill('x')
+        { name, count, cards }
       if $scope.myProperties.playerCards
         $scope.myProperties.playerCards.sort()
       $scope.roomInfo = room

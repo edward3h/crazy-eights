@@ -21,20 +21,18 @@
       h3.message(ng-hide='roomInfo.playerCount == 0') Players
       h3.message(ng-show='roomInfo.playerCount == 0') No Players!
       ul
-        li(ng-repeat='playerName in roomInfo.playerNames',
-          ng-class='{"current-user": $index == playerIndex, "current-player": roomInfo.gameState == "started" && $index == roomInfo.currentPlayer,"wants-to-start": roomInfo.gameState == "notstarted" && roomInfo.playerGameStarted[$index]}')
-          .fa.fa-arrow-right
-          .fa.fa-check
-          .fa.fa-star
-          | {{playerName}} [{{roomInfo.playerCards[$index].length / 2}}]
+        li(ng-repeat='player in players',ng-class='{"current-user": $index == playerIndex, "current-player": roomInfo.gameState == "started" && $index == roomInfo.currentPlayer,"wants-to-start": roomInfo.gameState == "notstarted" && roomInfo.playerGameStarted[$index]}')
+          .player
+            .fa.fa-arrow-right
+            .fa.fa-check
+            .fa.fa-star
+            | {{player.name}}
+          .cards
+            img(src='/images/cards/mini.png',ng-repeat='c in player.cards track by $index')
       h3.message(ng-hide='roomInfo.playerCount < 3') Direction of play
       .direction(ng-hide='roomInfo.playerCount < 3', ng-class='{"direction-up": direction < 0, "direction-down": direction > 0}')
         .fa.fa-arrow-up
         .fa.fa-arrow-down
-      .footer 
-        h3.message
-         a(href='https://github.com/edward3h/crazy-eights/issues',target='issues',rel='noreferrer noopener')  Bugs?
-        p If you spot a bug, click here and open an issue.
 
     .right-pane
 
@@ -89,8 +87,10 @@
       .contents(ng-click='alert = ""')
         h3 {{alert}}
 
-
-
+  .footer 
+    h3.message
+      a(href='https://github.com/edward3h/crazy-eights/issues',target='issues',rel='noreferrer noopener') Bugs?
+    p If you spot a bug, click here and open an issue.
 
 
 
