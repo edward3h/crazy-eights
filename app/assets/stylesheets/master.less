@@ -242,6 +242,9 @@ button.big-button {
       padding-bottom: 1rem;
       padding-right: 1rem;
     }
+    .fa {
+      display: none;
+    }
     ul {
       font-size: 1.5rem;
       display: flex;
@@ -258,12 +261,6 @@ button.big-button {
         line-height: 2rem;
         font-size: 2rem;
 
-        .fa {
-          display: none;
-          // position: absolute;
-          // top: 1rem;
-          // left: 1rem;
-        }
         &.current-user {
           .fa-star { display: inline-block; }
           &.current-player .fa-arrow-right, &.wants-to-start .fa-check {
@@ -292,6 +289,12 @@ button.big-button {
           }
         }
       }
+    }
+    .direction-up .fa-arrow-up {
+      display: inline-block;
+    }
+    .direction-down .fa-arrow-down {
+      display: inline-block;
     }
   }
 
