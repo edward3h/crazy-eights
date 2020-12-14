@@ -30,7 +30,7 @@
           .cards
             img(src='/images/cards/mini.png',ng-repeat='c in player.cards track by $index')
       h3.message(ng-hide='roomInfo.playerCount < 3') Direction of play
-      .direction(ng-hide='roomInfo.playerCount < 3', ng-class='{"direction-up": direction < 0, "direction-down": direction > 0}')
+      h3.message.direction(ng-hide='roomInfo.playerCount < 3', ng-class='{"direction-up": direction < 0, "direction-down": direction > 0}')
         .fa.fa-arrow-up
         .fa.fa-arrow-down
 
