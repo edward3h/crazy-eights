@@ -77,7 +77,7 @@
     .overlay.error(ng-show='error != ""')
       .contents
         a.close.fa.fa-close(href='#',ng-click='error = ""',ng-hide='fatal')
-        .message {{error}}
+        .message {{error}} (Code {{error_code}})
 
     .overlay.winner(ng-show='roomInfo.gameState == "ended"')
       .contents
