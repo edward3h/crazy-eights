@@ -79,6 +79,7 @@ angular.module 'crazy-eights.controllers', []
           $scope.fatal = true
         else
           $scope.error = 'some unknown error'
+          $scope.error_code = code
 
     loadRoomData = (data) ->
       { room } = data
