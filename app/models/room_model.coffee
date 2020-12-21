@@ -53,6 +53,8 @@ module.exports = (app) ->
               @playerGameWon.push(parseInt(room["player-#{index}-won"], 10))
 
             callback.call(@, @roomState())
+        else if @id != null
+          throw "Room #{@id} not found"
         else
           @createRoom =>
             callback.call(@, @roomState())
@@ -382,7 +384,8 @@ module.exports = (app) ->
       else callback.call(@, false)
 
     createRoom: (callback) ->
-      @id = Math.floor(Math.random() * parseInt("yzzzz", 36)) + 10000
+      # @id = Math.floor(Math.random() * parseInt("yzzzz", 36)) + 10000
+      @id = Math.floor(Math.random() * parseInt("yzz", 36)) + 100
       @id = @id.toString(36)
       @exists (roomExists) =>
         unless roomExists
