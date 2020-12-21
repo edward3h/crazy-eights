@@ -26,6 +26,7 @@ angular.module 'crazy-eights.controllers', []
           room: room
           loading: false
           login: true
+          username: localStorage.getItem 'username'
 
         $location.url "/#{room}"
     )()
@@ -34,6 +35,7 @@ angular.module 'crazy-eights.controllers', []
       return unless $scope.login
       $socket.on "room:#{$scope.room}:error", loadError
       $socket.on "room:#{$scope.room}:update", loadRoomData
+      localStorage.setItem 'username', $scope.username
       $socket.emit 'room:join', { joiningRoomid: $scope.room, joiningUsername: $scope.username }
       $scope.login = false
 

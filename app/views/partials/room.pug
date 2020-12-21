@@ -10,7 +10,7 @@
   .form.full-pane
     form(ng-submit='joinRoom()')
       h3.message Enter your name:
-      input.username(type='text',ng-model='username',maxlength='16')
+      input.username(type='text',ng-model='username',maxlength='16',required,minlength='3',pattern='\\S+',value='{{oldUsername}}')
       button.send(type='submit') Join
 
 .main-section.main-room(ng-show='!login && !loading')
