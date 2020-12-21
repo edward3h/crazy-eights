@@ -107,6 +107,8 @@ angular.module 'crazy-eights.controllers', []
         cards = new Array(count).fill('x')
         { name, count, cards }
       if $scope.myProperties.playerCards
+        if room.playState == 'playDraw'
+          $scope.drewCard = _.last $scope.myProperties.playerCards
         $scope.myProperties.playerCards.sort()
       $scope.roomInfo = room
       $scope.direction = room.direction

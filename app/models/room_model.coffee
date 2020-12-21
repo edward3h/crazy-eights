@@ -169,6 +169,7 @@ module.exports = (app) ->
                     if @pile.possibleNextMove(card, @wildColor, @playerCards[playerIndex])
                       @pile.addCard @playerCards[playerIndex].removeCard(card)
                       @wildColor = ''
+                      @playState = ''
 
                       unless @playerCards[playerIndex].isActive()
                         @playerGameWon[playerIndex] = _.max(@playerGameWon) + 1
@@ -281,10 +282,9 @@ module.exports = (app) ->
                 topCard = @deck.popCard()
                 @playerCards[playerIndex].addCard topCard
                 if @pile.possibleNextMove(topCard, @wildColor, @playerCards[playerIndex])
-                  @playCard({ username, card: topCard}, callback)
-                  return
-
-                @nextPlayer()
+                  @playState = 'playDraw'
+                else
+                  @nextPlayer()
 
                 app.client.hmset "room:#{@id}", @roomHash(), (err, data) =>
                   callback.call(@, error: false, room: @roomState())
@@ -309,6 +309,7 @@ module.exports = (app) ->
             playerIndex = @getPlayerIndex(username)
             unless playerIndex == -1
               if playerIndex == @currentPlayer
+                @playState = ''
                 @nextPlayer()
 
                 app.client.hmset "room:#{@id}", @roomHash(), (err, data) =>

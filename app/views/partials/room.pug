@@ -82,6 +82,13 @@
         ul
           li(ng-repeat='color in colors')
             button.big-button(ng-class='color',ng-click='chooseColor(color)') {{color}}
+    .overlay.playDraw(ng-show='isMyTurn && roomInfo.playState == "playDraw"')
+      .contents
+        .message Drew card
+        img.card(ng-src='/images/cards/{{drewCard}}.png')
+        .message Play it now?
+        button.big-button(ng-click='playCard(drewCard)') Yes
+        button.big-button(ng-click='skipTurn()') No
     .overlay.error(ng-show='error != ""')
       .contents
         a.close.fa.fa-close(href='#',ng-click='error = ""',ng-hide='fatal')
@@ -107,28 +114,3 @@
     p If you spot a bug, click here and open an issue.
 
 
-
-  //- .container
-
-  //-   .col-sm-12
-  //-     h1.title Welcome to Crazy Eights
-
-  //-   .col-sm-2.player-list
-  //-     p Players
-  //-     ul
-  //-       li(ng-repeat='playerName in roomInfo.playerNames',
-  //-         ng-class='{"current-player": $index == roomInfo.currentPlayer,"wants-to-start": roomInfo.playerGameStarted[$index]}') {{playerName}}
-
-  //-   .col-sm-10(ng-show='roomInfo.gameState == "notstarted"')
-
-  //-     p Game State: {{roomInfo.gameState}}
-
-  //-     p Your username: {{username}}
-
-  //-     p You are player number {{playerIndex + 1}}
-
-  //-     button(ng-click='startGame()') Start Game!
-
-  //-   .col-sm-10(ng-show='roomInfo.gameState == "started"')
-
-  //-     p THE GAME HAS BEGUN!
