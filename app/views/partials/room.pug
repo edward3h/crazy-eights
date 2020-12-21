@@ -11,7 +11,7 @@
     form(ng-submit='joinRoom()')
       h3.message Enter your name:
       input.username(type='text',ng-model='username',maxlength='16')
-      button.send(type='submit') join
+      button.send(type='submit') Join
 
 .main-section.main-room(ng-show='!login && !loading')
   .title-pane
@@ -46,6 +46,14 @@
           h3.message(ng-show='myProperties.playerStarted')
             .fa.fa-spinner.fa-pulse
             | Waiting for other players
+          hr
+          h3.message-small Copy the code and give it to your friends to invite them to this room
+          .copy-code
+            input#roomCode(type='text',value='{{room | uppercase}}',size='8')
+            button(ng-click='copyCode()') 
+              .fa.fa-copy
+              | Copy
+            .copied(ng-show='copied') Copied!
 
       .section.started(ng-show='roomInfo.gameState == "started"',ng-class='{"is-my-turn": isMyTurn}')
         .mask

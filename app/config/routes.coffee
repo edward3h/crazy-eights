@@ -14,6 +14,7 @@ module.exports = (app) ->
   # API routes
   app.post pathRaw('room.create'), RoomController.create
   app.get pathRaw('room.show'), RoomController.show
+  app.get pathRaw('room.exists'), RoomController.exists
 
   # Routes for partials
   app.get pathRaw('partial.show'), PartialsController.show

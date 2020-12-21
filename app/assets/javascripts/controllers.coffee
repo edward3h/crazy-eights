@@ -67,6 +67,12 @@ angular.module 'crazy-eights.controllers', []
       unless b
         $timeout ( -> window.location.href = '/'), 100
 
+    $scope.copyCode = () ->
+      el = document.getElementById('roomCode')
+      el.select()
+      document.execCommand('copy')
+      $scope.copied = true
+
     loadError = (data) ->
       { code } = data
       console.log 'received ERROR', code
@@ -121,4 +127,13 @@ angular.module 'crazy-eights.controllers', []
         # TODO: error handling
 
         $location.url "/#{room}"
-]
+
+    $scope.joinRoom = ->
+      $http.get("/rooms/#{$scope.room}/exists")
+      .success (data, status, headers, config) ->
+        $location.url "/#{$scope.room}"
+      .error (data, status, headers, config) ->
+        $scope.message = "Room does not exist"
+        console.log data
+
+] 

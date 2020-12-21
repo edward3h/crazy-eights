@@ -6,3 +6,9 @@
     button.big-button(ng-click="createRoom()")
       .fa.fa-user
       | Start game
+    h3.message Or
+    h3.message-small Enter an invite code to join a room.
+    form.copy-code(ng-submit='joinRoom()')
+      input#room(type='text',size='8',ng-model='room',minlength='3',required)
+      button(type='submit') Join room
+      .message(ng-show='message') {{message}}
