@@ -1,9 +1,7 @@
 {
   "name": "crazy-eights",
   "version": "0.0.0",
-  "authors": [
-    "Ankit Sardesai <amsardesai@gmail.com>"
-  ],
+  "authors": ["Ankit Sardesai <amsardesai@gmail.com>"],
   "license": "MIT",
   "private": true,
   "dependencies": {

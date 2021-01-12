@@ -52,7 +52,7 @@
           h3.message-small Copy the code and give it to your friends to invite them to this room
           .copy-code
             input#roomCode(type='text',value='{{room | uppercase}}',size='8')
-            button(ng-click='copyCode()') 
+            button(ng-click='copyCode()')
               .fa.fa-copy
               | Copy
             .copied(ng-show='copied') Copied!
@@ -94,7 +94,7 @@
     .overlay.error(ng-show='error != ""')
       .contents
         a.close.fa.fa-close(href='#',ng-click='error = ""',ng-hide='fatal')
-        .message 
+        .message
           .fa.fa-exclamation-triangle
           | {{error}} (Code {{error_code}})
         button.big-button(ng-click='error = ""') Oh darn!
@@ -113,9 +113,7 @@
       .contents(ng-click='alert = ""')
         h3 {{alert}}
 
-  .footer 
+  .footer
     h3.message
       a(href='https://github.com/edward3h/crazy-eights/issues',target='issues',rel='noreferrer noopener') Bugs?
     p If you spot a bug, click here and open an issue.
-
-

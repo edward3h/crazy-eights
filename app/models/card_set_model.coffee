@@ -25,7 +25,7 @@ module.exports = (app) ->
         console.log("removeCard", card, @set, array, index)
         if index > -1
           array.splice(index, 1)
-          @set = array.join '' 
+          @set = array.join ''
       card
 
     popCard: ->
@@ -60,7 +60,7 @@ module.exports = (app) ->
       @set = _.shuffle(deck).join ''
 
     validateCard: (card) ->
-      _.contains(@WILD, card) || 
+      _.contains(@WILD, card) ||
       (_.contains(@POSSIBLE_SUITS, card.charAt(0)) &&
       _.contains(@POSSIBLE_NUMBERS, card.charAt(1)))
 

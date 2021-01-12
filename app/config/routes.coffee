@@ -103,11 +103,10 @@ module.exports = (app) ->
       { b } = data
       console.log "room:playAgain with id:#{roomid} username:#{username} value:#{b}"
       new RoomModel roomid, ->
-        if b 
+        if b
           @startGame { username }, updateEveryone
         else
           @removePlayer { username }, (data) ->
             roomid = 0
             username = ''
             updateEveryone(data)
-         

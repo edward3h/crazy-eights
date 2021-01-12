@@ -140,4 +140,4 @@ angular.module 'crazy-eights.controllers', []
         $scope.message = "Room does not exist"
         console.log data
 
-] 
+]

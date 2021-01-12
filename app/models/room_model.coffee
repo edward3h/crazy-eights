@@ -29,7 +29,7 @@ module.exports = (app) ->
           @pile.clear()
           @pile.addCard(topCard)
       )
-      
+
       @gameState = 'notstarted'
       # States:
       # notstarted - Game has not started
@@ -244,7 +244,7 @@ module.exports = (app) ->
                         @nextPlayer()
                         @alert = "Player #{@playerNames[@currentPlayer]} had to draw 4"
                         for n in [1..4]
-                          @playerCards[@currentPlayer].addCard @deck.popCard()                      
+                          @playerCards[@currentPlayer].addCard @deck.popCard()
                       @nextPlayer()
                       app.client.hmset "room:#{@id}", @roomHash(), (err, data) =>
                         callback.call(@, error: false, room: @roomState())
