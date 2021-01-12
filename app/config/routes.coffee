@@ -30,19 +30,20 @@ module.exports = (app) ->
     username = ''
 
     updateEveryone = (data) ->
-      { error, code, room } = data
+      { error, code, room, message } = data
       if error
-        console.log "Emmitting room:#{roomid}:error"
-        console.log { code }
-        app.io.emit "room:#{roomid}:error", { code }
+        console.log "Emitting room:#{roomid}:error"
+        console.log { code, message }
+        app.io.emit "room:#{roomid}:error", { code, message }
       else
-        console.log "Emmitting room:#{roomid}:update"
+        console.log "Emitting room:#{roomid}:update"
         console.log { room }
         app.io.emit "room:#{roomid}:update", { room }
       console.log ""
 
     # handle disconnects
     socket.on 'disconnect', ->
+      console.log "disconnect room #{roomid} user #{username}"
       if roomid && username
         new RoomModel roomid, ->
           @disconnect { username }, updateEveryone

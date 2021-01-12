@@ -76,17 +76,17 @@ angular.module 'crazy-eights.controllers', []
       $scope.copied = true
 
     loadError = (data) ->
-      { code } = data
+      { code, message } = data
       console.log 'received ERROR', code
       switch code
         when 46
           $scope.invalidMove = true
           $timeout ( -> $scope.invalidMove = false ), 2000
         when 10, 20, 30, 40, 50, 60, 70
-          $scope.error = 'doesnt exist'
+          $scope.error = message || 'doesnt exist'
           $scope.fatal = true
         else
-          $scope.error = 'some unknown error'
+          $scope.error = message || 'some unknown error'
           $scope.error_code = code
 
     loadRoomData = (data) ->

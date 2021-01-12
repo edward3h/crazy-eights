@@ -15,6 +15,8 @@
 
 .main-section.main-room(ng-show='!login && !loading')
   .title-pane
+    h1.title#home
+      a.fa.fa-home(href='/')
     h1.title NUO
   .container
     .left-pane.player-list
@@ -92,7 +94,10 @@
     .overlay.error(ng-show='error != ""')
       .contents
         a.close.fa.fa-close(href='#',ng-click='error = ""',ng-hide='fatal')
-        .message {{error}} (Code {{error_code}})
+        .message 
+          .fa.fa-exclamation-triangle
+          | {{error}} (Code {{error_code}})
+        button.big-button(ng-click='error = ""') Oh darn!
 
     .overlay.winner(ng-show='roomInfo.gameState == "ended"')
       .contents

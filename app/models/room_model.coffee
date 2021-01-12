@@ -334,18 +334,18 @@ module.exports = (app) ->
         if roomExists
 
           # Game has not started yet
-          if @gameState == 'notstarted'
+          if @gameState == 'notstarted' || @gameState == 'ended'
             @removePlayer { username }, callback
 
           # Game is in progress
           else if @gameState == 'started'
             playerIndex = @getPlayerIndex(username)
-            if playerIndex > -1 && !@playerCards[playerIndex].isActive()
+            if playerIndex > -1 && @playerCards[playerIndex].isActive()
 
               # Destroy game if an active player disconnects
               @gameState = 'disconnected'
               app.client.del "room:#{@id}", (err, data) =>
-                callback.call(@, error: false, room: @roomState())
+                callback.call(@, error: true, code: 82, message: "Player #{username} disconnected")
 
         # We're loading a room that doesn't exist
         else callback.call(@, error: true, code: 70)

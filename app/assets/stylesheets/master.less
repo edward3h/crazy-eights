@@ -146,6 +146,18 @@ button.big-button {
       font-family: "Bree Serif", serif;
       color: #fff;
       text-shadow: 0 0 0.5rem #000;
+      position: relative;
+
+      .fa-home {
+        position: absolute;
+        left: 0;
+        top: 0;
+        font-size: 3rem;
+      }
+    }      
+    
+    #home {
+      z-index: 100;
     }
   }
 
@@ -498,6 +510,11 @@ h3.message-small {
   .error {
     .message {
       font-size: 1.5rem;
+
+      .fa {
+        margin-right: 0.7rem;
+        color: red;
+      }
     }
   }
 
